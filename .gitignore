@@ -9,3 +9,6 @@ coverage
 .prisma
 prisma/*.db
 prisma/*.db-journal
+
+# Fichiers uploadés par les utilisateurs (persistants sur le serveur, pas en git)
+public/uploads/
