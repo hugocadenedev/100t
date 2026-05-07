@@ -1,0 +1,17 @@
+- [x] Verify that the copilot-instructions.md file in the .github directory is created.
+- [x] Clarify Project Requirements
+- [x] Scaffold the Project
+- [x] Customize the Project
+- [x] Install Required Extensions
+- [x] Compile the Project
+- [x] Create and Run Task
+- [ ] Launch the Project
+- [x] Ensure Documentation is Complete
+
+- Projet : application Next.js TypeScript pour 100T, marketplace de coaching sportif en français.
+- Fonctionnel : rôles visiteur, abonné et coach, authentification, abonnements par coach, dashboards, programmes et séances sécurisés.
+- Build : `npm run build` passe.
+- Tâche créée : `Dev Server 100T`.
+- Documentation : README créé et mis à jour.
+- Extensions : aucune extension supplémentaire requise par le setup tool.
+- Lancement debug : en attente de confirmation utilisateur.
