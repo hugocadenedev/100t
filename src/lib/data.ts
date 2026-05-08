@@ -72,12 +72,12 @@ export async function getMarketplaceData(
   if (search) {
     filters.push({
       OR: [
-        { discipline: { contains: search, mode: "insensitive" } },
-        { specialities: { contains: search, mode: "insensitive" as const } },
-        { headline: { contains: search, mode: "insensitive" as const } },
-        { city: { contains: search, mode: "insensitive" as const } },
-        { user: { firstName: { contains: search, mode: "insensitive" as const } } },
-        { user: { lastName: { contains: search, mode: "insensitive" as const } } },
+        { discipline: { contains: search } },
+        { specialities: { contains: search } },
+        { headline: { contains: search } },
+        { city: { contains: search } },
+        { user: { firstName: { contains: search } } },
+        { user: { lastName: { contains: search } } },
       ],
     });
   }
