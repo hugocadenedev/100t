@@ -62,8 +62,8 @@ export function MobileHamburger({ role }: MobileHamburgerProps) {
     <>
       <button
         type="button"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px', color: 'white', background: 'none', border: 'none', cursor: 'pointer' }}
-        className="md:hidden"
+        style={{ alignItems: 'center', justifyContent: 'center', padding: '8px', color: 'white', background: 'none', border: 'none', cursor: 'pointer' }}
+        className="flex md:hidden"
         onClick={() => setOpen(true)}
         aria-label="Menu"
       >
