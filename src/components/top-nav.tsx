@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { fullName } from "@/lib/utils";
 import { LogoutButton } from "@/components/logout-button";
+import { MobileHamburger } from "@/components/mobile-hamburger";
 
 export async function TopNav() {
   const user = await getCurrentUser();
@@ -32,6 +33,7 @@ export async function TopNav() {
           </nav>
         </div>
         <div className="flex items-center gap-3 md:gap-4">
+          <MobileHamburger role={user?.role} />
           <form action="/coachs" className="hidden items-center md:flex">
             <input
               type="search"
