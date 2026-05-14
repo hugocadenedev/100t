@@ -54,7 +54,7 @@ export async function getMarketplaceData(
   }
 
   if (speciality) {
-    filters.push({ specialities: { contains: speciality, mode: "insensitive" as const } });
+    filters.push({ specialities: { contains: speciality } });
   }
 
   if (price === "under-30") {
