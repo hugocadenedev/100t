@@ -14,6 +14,7 @@ jobs:
       - name: Deploy
         run: |
           set -e
+          sudo chown -R runner:runner /var/www/100t
           cd /var/www/100t
           git checkout -- next-env.d.ts 2>/dev/null || true
           git pull origin main
