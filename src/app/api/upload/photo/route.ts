@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
+import { mkdir, writeFile } from "fs/promises";
 import { join } from "path";
 import { randomBytes } from "crypto";
 
@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
   const filePath = join(uploadDir, fileName);
 
   const buffer = Buffer.from(await file.arrayBuffer());
+  await mkdir(uploadDir, { recursive: true });
   await writeFile(filePath, buffer);
 
   return NextResponse.json({ url: `/uploads/photos/${fileName}` });
