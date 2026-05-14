@@ -744,7 +744,13 @@ export function RegisterForm({
         <button type="button" onClick={() => setRole(null)} className="flex items-center gap-1.5 transition hover:text-white">
           ← Changer de profil
         </button>
-        <Link href={redirectAfter ? `/connexion?redirectAfter=${encodeURIComponent(redirectAfter)}` : "/connexion"} className="hover:text-white">Déjà inscrit ? Se connecter</Link> {
+        <Link href={redirectAfter ? `/connexion?redirectAfter=${encodeURIComponent(redirectAfter)}` : "/connexion"} className="hover:text-white">Déjà inscrit ? Se connecter</Link>
+      </div>
+    </AuthCard>
+  );
+}
+
+export function ForgotPasswordForm() {
   const [state, formAction] = useActionState(requestPasswordResetAction, initialActionState);
 
   return (
