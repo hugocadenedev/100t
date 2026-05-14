@@ -91,6 +91,8 @@ model CoachProfile {
   postalCode         String
   country            String
   phone              String?
+  diplomas           String?
+  diplomaFileUrl     String?
   instagramUrl       String?
   tiktokUrl          String?
   youtubeUrl         String?

@@ -126,6 +126,79 @@ function PhotoDropzone({ name = "photoUrl" }: { name?: string }) {
   );
 }
 
+/* ── Diploma file drop zone ── */
+function DiplomaDropzone() {
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [url, setUrl] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const uploadFile = useCallback(async (file: File) => {
+    setError(null);
+    setUploading(true);
+    const fd = new FormData();
+    fd.append("file", file);
+    try {
+      const res = await fetch("/api/upload/diploma", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Erreur d'upload");
+      setUrl(json.url);
+      setFileName(file.name);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Erreur inconnue");
+    } finally {
+      setUploading(false);
+    }
+  }, []);
+
+  return (
+    <div className="space-y-2">
+      <input type="hidden" name="diplomaFileUrl" value={url} />
+      <div
+        role="button"
+        tabIndex={0}
+        aria-label="Zone de dépôt justificatif de diplôme"
+        className="relative flex min-h-[80px] cursor-pointer flex-col items-center justify-center gap-2 rounded-[14px] border-2 border-dashed border-white/10 bg-white/[0.02] px-4 text-center transition hover:border-[var(--accent)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
+        onClick={() => inputRef.current?.click()}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") inputRef.current?.click(); }}
+      >
+        {uploading ? (
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/10 border-t-[var(--accent)]" />
+            <span className="text-xs text-white/40">Upload en cours…</span>
+          </div>
+        ) : fileName ? (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-emerald-400">✓</span>
+            <span className="text-sm text-white/70 truncate max-w-[240px]">{fileName}</span>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); setFileName(null); setUrl(""); }}
+              className="ml-1 text-xs text-white/30 hover:text-white/60"
+            >✕</button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-xs text-white/40">
+              Glisse ton justificatif ou <span className="font-semibold text-[var(--accent)]">parcourir</span>
+            </span>
+            <span className="text-[10px] text-white/20">PDF, JPG, PNG • max 5 Mo</span>
+          </div>
+        )}
+      </div>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="application/pdf,image/jpeg,image/png,image/webp"
+        className="hidden"
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadFile(f); }}
+      />
+      {error && <p className="text-xs text-rose-400">{error}</p>}
+    </div>
+  );
+}
+
 function FormMessage({ message, type }: { message?: string; type: "success" | "error" | "idle" }) {
   if (!message) {
     return null;
@@ -191,8 +264,29 @@ function CoachStepPill({
   );
 }
 
-function CoachApplicationFields() {
+const DIPLOMA_OPTIONS = [
+  "Brevet d'État",
+  "Brevet Professionnel",
+  "BPJEPS AGFF",
+  "CQP",
+] as const;
+
+function CoachApplicationFields({ categories }: { categories: { id: string; name: string }[] }) {
   const [step, setStep] = useState(0);
+  const [selectedSports, setSelectedSports] = useState<string[]>([]);
+  const [selectedDiplomas, setSelectedDiplomas] = useState<string[]>([]);
+  const [customDiploma, setCustomDiploma] = useState("");
+  const [discipline, setDiscipline] = useState("");
+
+  const toggleSport = (name: string) =>
+    setSelectedSports((prev) =>
+      prev.includes(name) ? prev.filter((s) => s !== name) : [...prev, name]
+    );
+
+  const toggleDiploma = (name: string) =>
+    setSelectedDiplomas((prev) =>
+      prev.includes(name) ? prev.filter((d) => d !== name) : [...prev, name]
+    );
   const stepRefs = useRef<Array<HTMLFieldSetElement | null>>([]);
 
   const stepLabels = ["Compte", "Positionnement", "Profil public", "Coordonnées"];
@@ -261,27 +355,110 @@ function CoachApplicationFields() {
         </div>
       </fieldset>
 
-      <fieldset ref={(node) => void (stepRefs.current[1] = node)} className={step === 1 ? "space-y-4" : "hidden"}>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2 md:col-span-2">
-            <label className="text-sm text-white/75" htmlFor="headline">
-              Accroche professionnelle
-            </label>
-            <input
-              id="headline"
-              name="headline"
-              minLength={12}
-              required
-              className="field"
-              placeholder="Ex: Préparation physique sur mesure pour performance et transformation durable"
-            />
+      <fieldset ref={(node) => void (stepRefs.current[1] = node)} className={step === 1 ? "space-y-5" : "hidden"}>
+        {/* Hidden fields storing multi-select values */}
+        <input type="hidden" name="discipline" value={discipline} />
+        <input
+          type="hidden"
+          name="specialities"
+          value={selectedSports.join(", ")}
+        />
+        <input
+          type="hidden"
+          name="diplomas"
+          value={JSON.stringify([
+            ...selectedDiplomas,
+            ...(customDiploma.trim() ? [`Autre: ${customDiploma.trim()}`] : []),
+          ])}
+        />
+
+        <div className="space-y-2 md:col-span-2">
+          <label className="text-sm text-white/75" htmlFor="headline">
+            Accroche professionnelle
+          </label>
+          <input
+            id="headline"
+            name="headline"
+            minLength={12}
+            required
+            className="field"
+            placeholder="Ex: Préparation physique sur mesure pour performance et transformation durable"
+          />
+        </div>
+
+        {/* Sport pratiqué actuellement — champ texte libre */}
+        <div className="space-y-2">
+          <label className="text-sm text-white/75" htmlFor="discipline">
+            Sport pratiqué actuellement
+          </label>
+          <input
+            id="discipline"
+            name="_discipline_display"
+            className="field"
+            placeholder="CrossFit, Hyrox, Running..."
+            value={discipline}
+            onChange={(e) => setDiscipline(e.target.value)}
+          />
+        </div>
+
+        {/* Spécialité — catégories multi-select */}
+        <div className="space-y-2">
+          <p className="text-sm text-white/75">Spécialité</p>
+          {categories.length === 0 ? (
+            <p className="text-xs text-white/30">Aucune catégorie configurée pour l'instant.</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => toggleSport(cat.name)}
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                    selectedSports.includes(cat.name)
+                      ? "border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)]"
+                      : "border-white/15 bg-white/[0.03] text-white/60 hover:border-white/30"
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Diplômes */}
+        <div className="space-y-3">
+          <p className="text-sm text-white/75">Diplômes</p>
+          <div className="flex flex-wrap gap-2">
+            {DIPLOMA_OPTIONS.map((diploma) => (
+              <button
+                key={diploma}
+                type="button"
+                onClick={() => toggleDiploma(diploma)}
+                className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                  selectedDiplomas.includes(diploma)
+                    ? "border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)]"
+                    : "border-white/15 bg-white/[0.03] text-white/60 hover:border-white/30"
+                }`}
+              >
+                {diploma}
+              </button>
+            ))}
           </div>
-          <div className="space-y-2">
-            <label className="text-sm text-white/75" htmlFor="discipline">
-              Discipline principale
-            </label>
-            <input id="discipline" name="discipline" required className="field" placeholder="CrossFit, Hyrox, Running..." />
+          <input
+            type="text"
+            value={customDiploma}
+            onChange={(e) => setCustomDiploma(e.target.value)}
+            className="field"
+            placeholder="Autre diplôme (saisie libre)"
+          />
+          <div className="space-y-1">
+            <p className="text-xs text-white/40">Justificatif (optionnel)</p>
+            <DiplomaDropzone />
           </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <label className="text-sm text-white/75" htmlFor="experienceYears">
               Années d'expérience
@@ -311,23 +488,9 @@ function CoachApplicationFields() {
             placeholder="Présente ton parcours, ton approche, ton type d'accompagnement et les profils que tu aides le mieux."
           />
         </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <label className="text-sm text-white/75" htmlFor="specialities">
-              Spécialisations
-            </label>
-            <input
-              id="specialities"
-              name="specialities"
-              required
-              className="field"
-              placeholder="Force, perte de poids, mobilité, trail"
-            />
-          </div>
-          <div className="space-y-2 md:col-span-2">
-            <label className="text-sm text-white/75">Photo de profil</label>
-            <PhotoDropzone name="photoUrl" />
-          </div>
+        <div className="space-y-2">
+          <label className="text-sm text-white/75">Photo de profil</label>
+          <PhotoDropzone name="photoUrl" />
         </div>
       </fieldset>
 
@@ -463,7 +626,13 @@ export function LoginForm() {
   );
 }
 
-export function RegisterForm({ initialRole }: { initialRole?: "USER" | "COACH" }) {
+export function RegisterForm({
+  initialRole,
+  categories = [],
+}: {
+  initialRole?: "USER" | "COACH";
+  categories?: { id: string; name: string }[];
+}) {
   const [state, formAction] = useActionState(registerAction, initialActionState);
   const [role, setRole] = useState<"USER" | "COACH" | null>(initialRole ?? null);
 
@@ -558,7 +727,7 @@ export function RegisterForm({ initialRole }: { initialRole?: "USER" | "COACH" }
           </div>
         ) : (
           <div className="rounded-[22px] border border-white/6 bg-white/[0.02] p-5">
-            <CoachApplicationFields />
+            <CoachApplicationFields categories={categories} />
           </div>
         )}
       </form>

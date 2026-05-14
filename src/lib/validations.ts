@@ -27,6 +27,8 @@ export const registerSchema = z
     monthlyPrice: z.coerce.number().int().min(1, "Le tarif mensuel doit être supérieur à 0.").optional(),
     discipline: z.string().trim().optional(),
     specialities: z.string().trim().optional(),
+    diplomas: z.string().trim().optional(),
+    diplomaFileUrl: z.string().trim().optional(),
     skills: z.string().trim().optional(),
     experienceYears: z.coerce.number().int().min(0, "L'expérience ne peut pas être négative.").optional(),
     coachedClientsCount: z.coerce.number().int().min(0, "Le nombre de clients ne peut pas être négatif.").optional(),
@@ -53,8 +55,8 @@ export const registerSchema = z
     const requiredCoachFields = [
       { key: "headline", message: "L'accroche coach est requise." },
       { key: "bio", message: "La bio coach est requise." },
-      { key: "discipline", message: "La discipline principale est requise." },
-      { key: "specialities", message: "Ajoute au moins une spécialité." },
+      { key: "discipline", message: "Sélectionne au moins un sport pratiqué." },
+      { key: "specialities", message: "La spécialité est requise." },
     ] as const;
 
     for (const field of requiredCoachFields) {

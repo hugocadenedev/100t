@@ -627,9 +627,12 @@ function CoachIcon({ path, className = "h-4 w-4" }: { path: string; className?: 
   );
 }
 
-export function CoachStudioClient({ studio }: { studio: StudioData }) {
+export function CoachStudioClient({ studio, categories = [] }: { studio: StudioData; categories?: { id: string; name: string }[] }) {
   const [profileState, profileAction] = useActionState(saveCoachProfileAction, initialActionState);
   const [activeTab, setActiveTab] = useState<CoachTab>("dashboard");
+  const [selectedSpecialities, setSelectedSpecialities] = useState<string[]>(
+    () => (studio.coach.specialities ? studio.coach.specialities.split(", ").filter(Boolean) : []),
+  );
 
   if (studio.coach.approvalStatus !== "APPROVED") {
     return <CoachApplicationStatusPanel studio={studio} />;
@@ -780,9 +783,35 @@ export function CoachStudioClient({ studio }: { studio: StudioData }) {
                 <label className="text-sm text-white/70">Discipline</label>
                 <input name="discipline" defaultValue={studio.coach.discipline} className="field" required />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 md:col-span-2">
                 <label className="text-sm text-white/70">Spécialités</label>
-                <input name="specialities" defaultValue={studio.coach.specialities} className="field" required />
+                <input type="hidden" name="specialities" value={selectedSpecialities.join(", ")} />
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => {
+                    const isSelected = selectedSpecialities.includes(cat.name);
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() =>
+                          setSelectedSpecialities((prev) =>
+                            isSelected ? prev.filter((s) => s !== cat.name) : [...prev, cat.name],
+                          )
+                        }
+                        className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                          isSelected
+                            ? "border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)]"
+                            : "border-white/10 bg-white/[0.03] text-white/60 hover:border-white/30 hover:text-white/80"
+                        }`}
+                      >
+                        {cat.name}
+                      </button>
+                    );
+                  })}
+                </div>
+                {categories.length === 0 && (
+                  <p className="text-xs text-white/40">Aucune catégorie configurée par l&apos;administration.</p>
+                )}
               </div>
               <div className="space-y-2">
                 <label className="text-sm text-white/70">Compétences</label>
