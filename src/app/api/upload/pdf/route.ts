@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
   // Verify ownership
   const submission = await prisma.programSubmission.findFirst({
     where: { id: submissionId, coachId: user.coachProfile.id },
-    select: { id: true, durationMonths: true },
+    select: { id: true, durationMonths: true, status: true },
   });
   if (!submission) {
     return NextResponse.json({ error: "Dépôt introuvable." }, { status: 404 });
@@ -76,6 +76,18 @@ export async function POST(request: NextRequest) {
     create: { submissionId, monthNumber, pdfUrl, label: label ?? null },
   });
 
+  // Si le programme est approuvé mais qu'il manque encore des PDFs, le repasser en validation
+  if (submission.status === "APPROVED") {
+    const pdfCount = await prisma.submissionPdf.count({ where: { submissionId } });
+    if (pdfCount < submission.durationMonths) {
+      await prisma.programSubmission.update({
+        where: { id: submissionId },
+        data: { status: "PENDING" },
+      });
+    }
+  }
+
   revalidatePath("/coach-studio");
+  revalidatePath("/admin");
   return NextResponse.json({ url: pdfUrl });
 }
