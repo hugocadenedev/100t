@@ -1,9 +1,10 @@
 "use client";
 
-import { startTransition, useActionState, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
 
-import { addSubmissionPdfAction, submitProgramAction } from "@/lib/actions";
+import { submitProgramAction } from "@/lib/actions";
 import { EQUIPMENT_OPTIONS, ProgramLevel, programLevelValues } from "@/lib/domain";
 import { programLevelLabels } from "@/lib/utils";
 import { initialActionState } from "@/lib/validations";
@@ -488,32 +489,49 @@ function MonthSlotUploader({
   submissionId: string;
   monthNumber: number;
 }) {
-  const [state, formAction] = useActionState(addSubmissionPdfAction, initialActionState);
+  const router = useRouter();
   const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const isPending = state.status === "idle";
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState<{ status: "success" | "error"; text: string } | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!pdfFile) return;
-    const fd = new FormData(e.currentTarget);
-    fd.set("pdfFile", pdfFile);
-    startTransition(() => formAction(fd));
+    setUploading(true);
+    setMessage(null);
+    const fd = new FormData();
+    fd.set("file", pdfFile);
+    fd.set("submissionId", submissionId);
+    fd.set("monthNumber", String(monthNumber));
+    try {
+      const res = await fetch("/api/upload/pdf", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok) {
+        setMessage({ status: "error", text: json.error ?? "Erreur lors de l'upload." });
+      } else {
+        setMessage({ status: "success", text: `PDF du mois ${monthNumber} enregistré.` });
+        setPdfFile(null);
+        router.refresh();
+      }
+    } catch {
+      setMessage({ status: "error", text: "Erreur réseau lors de l'upload." });
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="mt-2 space-y-2">
-      <input type="hidden" name="submissionId" value={submissionId} />
-      <input type="hidden" name="monthNumber" value={monthNumber} />
       <PdfDropZone
         onChange={(file) => setPdfFile(file)}
         label={`Mois ${monthNumber}`}
       />
-      {state.status !== "idle" && state.message ? (
-        <p className={`text-xs ${state.status === "success" ? "text-emerald-400" : "text-rose-400"}`}>
-          {state.message}
+      {message ? (
+        <p className={`text-xs ${message.status === "success" ? "text-emerald-400" : "text-rose-400"}`}>
+          {message.text}
         </p>
       ) : null}
-      {pdfFile ? <UploadPdfButton isPending={isPending} /> : null}
+      {pdfFile ? <UploadPdfButton isPending={uploading} /> : null}
     </form>
   );
 }
