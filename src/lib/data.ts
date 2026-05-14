@@ -326,34 +326,31 @@ export async function getProgramPageData(programId: string) {
       })
     : null;
 
-  // Legacy check: old-style coach subscription
-  const hasLegacyCoachSub = Boolean(
+  // Legacy check: old-style coach subscription (used only for date calculations, not access)
+  const hasActiveSub = Boolean(
     subscription &&
-      subscription.coachId === program.coachId &&
       subscription.currentPeriodEnd > new Date(),
   );
 
+  // Access requires an explicit MonthlyProgramSelection — no more blanket coach access
   const canAccess = Boolean(
     user?.role === "ADMIN" ||
       isOwner ||
-      monthlySelection !== null ||
-      hasLegacyCoachSub,
+      monthlySelection !== null,
   );
 
   // ── Calcul des mois débloqués pour cet abonné ────────────────────────────
-  // Admin et propriétaire voient tout (null = pas de restriction).
-  // Un abonné actif voit les mois débloqués depuis le début de son abonnement.
-  // Sans accès : 0 mois débloqués.
-  let unlockedMonths: number | null = null; // null = tous les mois visibles
+  let unlockedMonths: number | null = null;
   let subscriptionStartedAt: Date | null = null;
 
   if (user?.role === "ADMIN" || isOwner) {
     unlockedMonths = null; // aucune restriction
-  } else if (hasLegacyCoachSub && subscription?.startedAt) {
+  } else if (canAccess && hasActiveSub && subscription?.startedAt) {
+    // Utilise la date de début d'abonnement pour calculer les mois débloqués
     subscriptionStartedAt = subscription.startedAt;
     unlockedMonths = getUnlockedMonths(subscription.startedAt);
   } else if (canAccess) {
-    // Accès via monthlySelection mais pas de startedAt connu → tout débloquer
+    // Accès via sélection mais pas de startedAt connu → tout débloquer
     unlockedMonths = null;
   } else {
     unlockedMonths = 0; // aucun accès

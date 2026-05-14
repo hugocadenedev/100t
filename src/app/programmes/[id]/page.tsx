@@ -43,10 +43,16 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
   if (!data) notFound();
 
   const { canAccess } = data;
+  const { user } = data;
   const program = "program" in data ? data.program : null;
   if (!program) notFound();
 
   const { unlockedMonths, subscriptionStartedAt } = program;
+
+  // Lien d'abonnement : inscription si non connecté, page coach sinon
+  const subscribeHref = user
+    ? `/coach/${program.coachSlug}`
+    : `/inscription?redirectAfter=${encodeURIComponent(`/programmes/${id}`)}`;
 
   const equipment = parseEquipment(program.submissionMeta?.equipment);
   const hasPdfs = program.monthlyPdfs.length > 0;
@@ -232,7 +238,7 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
                   <p className="text-xs text-white/35">
                     🔒 {program.monthlyPdfs.length} PDF{program.monthlyPdfs.length > 1 ? "s" : ""} disponible{program.monthlyPdfs.length > 1 ? "s" : ""} pour les abonnés
                   </p>
-                  <Link href={`/coach/${program.coachSlug}`} className="mt-3 inline-block text-xs font-semibold text-[var(--accent)] hover:underline">
+                  <Link href={subscribeHref} className="mt-3 inline-block text-xs font-semibold text-[var(--accent)] hover:underline">
                     S&apos;abonner pour y accéder →
                   </Link>
                 </div>
@@ -259,7 +265,7 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
               ) : (
                 <div className="rounded-[14px] border border-white/6 bg-white/[0.02] p-5 text-center">
                   <p className="text-xs text-white/35">🔒 PDF disponible pour les abonnés</p>
-                  <Link href={`/coach/${program.coachSlug}`} className="mt-3 inline-block text-xs font-semibold text-[var(--accent)] hover:underline">S&apos;abonner pour y accéder →</Link>
+                  <Link href={subscribeHref} className="mt-3 inline-block text-xs font-semibold text-[var(--accent)] hover:underline">S&apos;abonner pour y accéder →</Link>
                 </div>
               )}
             </div>

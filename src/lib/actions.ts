@@ -272,6 +272,11 @@ export async function registerAction(_: ActionState, formData: FormData): Promis
     redirect("/coach-studio");
   }
 
+  const redirectAfter = formData.get("redirectAfter");
+  if (typeof redirectAfter === "string" && redirectAfter.startsWith("/") && !redirectAfter.startsWith("//")) {
+    redirect(redirectAfter);
+  }
+
   redirect("/tableau-de-bord");
 }
 
@@ -319,6 +324,11 @@ export async function loginAction(_: ActionState, formData: FormData): Promise<A
 
   if (user.role === Role.COACH) {
     redirect("/coach-studio");
+  }
+
+  const redirectAfter = formData.get("redirectAfter");
+  if (typeof redirectAfter === "string" && redirectAfter.startsWith("/") && !redirectAfter.startsWith("//")) {
+    redirect(redirectAfter);
   }
 
   redirect("/tableau-de-bord");

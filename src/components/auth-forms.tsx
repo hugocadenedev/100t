@@ -590,8 +590,12 @@ function CoachApplicationFields({ categories }: { categories: { id: string; name
   );
 }
 
-export function LoginForm() {
+export function LoginForm({ redirectAfter }: { redirectAfter?: string }) {
   const [state, formAction] = useActionState(loginAction, initialActionState);
+
+  const registerHref = redirectAfter
+    ? `/inscription?redirectAfter=${encodeURIComponent(redirectAfter)}`
+    : "/inscription";
 
   return (
     <AuthCard
@@ -599,6 +603,7 @@ export function LoginForm() {
       description="Accède à tes abonnements, tes programmes et ton espace 100T."
     >
       <form action={formAction} className="mx-auto max-w-[28rem] space-y-4">
+        {redirectAfter && <input type="hidden" name="redirectAfter" value={redirectAfter} />}
         <FormMessage message={state.message} type={state.status} />
         <div className="space-y-2">
           <label className="text-sm text-white/75" htmlFor="email">
@@ -618,7 +623,7 @@ export function LoginForm() {
         <Link href="/mot-de-passe-oublie" className="hover:text-white">
           Mot de passe oublié ?
         </Link>
-        <Link href="/inscription" className="hover:text-white">
+        <Link href={registerHref} className="hover:text-white">
           Créer un compte
         </Link>
       </div>
@@ -629,9 +634,11 @@ export function LoginForm() {
 export function RegisterForm({
   initialRole,
   categories = [],
+  redirectAfter,
 }: {
   initialRole?: "USER" | "COACH";
   categories?: { id: string; name: string }[];
+  redirectAfter?: string;
 }) {
   const [state, formAction] = useActionState(registerAction, initialActionState);
   const [role, setRole] = useState<"USER" | "COACH" | null>(initialRole ?? null);
@@ -695,6 +702,7 @@ export function RegisterForm({
     >
       <form action={formAction} className="space-y-5">
         <input type="hidden" name="role" value={role} />
+        {redirectAfter && <input type="hidden" name="redirectAfter" value={redirectAfter} />}
         <FormMessage message={state.message} type={state.status} />
 
         {role === Role.USER ? (
@@ -736,13 +744,7 @@ export function RegisterForm({
         <button type="button" onClick={() => setRole(null)} className="flex items-center gap-1.5 transition hover:text-white">
           ← Changer de profil
         </button>
-        <Link href="/connexion" className="hover:text-white">Déjà inscrit ? Se connecter</Link>
-      </div>
-    </AuthCard>
-  );
-}
-
-export function ForgotPasswordForm() {
+        <Link href={redirectAfter ? `/connexion?redirectAfter=${encodeURIComponent(redirectAfter)}` : "/connexion"} className="hover:text-white">Déjà inscrit ? Se connecter</Link> {
   const [state, formAction] = useActionState(requestPasswordResetAction, initialActionState);
 
   return (

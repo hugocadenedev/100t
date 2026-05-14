@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { createPortal } from "react-dom";
 
@@ -11,15 +12,31 @@ export function SubscribeModal({
   coachName,
   monthlyPrice,
   triggerClassName,
+  isAuthenticated = true,
+  redirectAfter,
 }: {
   coachId: string;
   coachName: string;
   monthlyPrice: number;
   triggerClassName?: string;
+  isAuthenticated?: boolean;
+  redirectAfter?: string;
 }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const handleOpenModal = () => {
+    if (!isAuthenticated) {
+      const dest = redirectAfter
+        ? `/inscription?redirectAfter=${encodeURIComponent(redirectAfter)}`
+        : "/inscription";
+      router.push(dest);
+      return;
+    }
+    setOpen(true);
+  };
 
   const handleConfirm = () => {
     setError(null);
@@ -47,7 +64,7 @@ export function SubscribeModal({
       <button
         type="button"
         className={triggerClassName ?? "app-button-accent px-5 py-3 text-sm font-semibold transition hover:opacity-90"}
-        onClick={() => setOpen(true)}
+        onClick={handleOpenModal}
       >
         S'abonner à {formatPrice(monthlyPrice)} / mois
       </button>

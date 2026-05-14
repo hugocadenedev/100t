@@ -53,8 +53,8 @@ export async function POST(req: NextRequest) {
 }
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  const { userId, coachId } = session.metadata ?? {};
-  if (!userId || !coachId) return;
+  const { userId, coachId, plan, commitmentMonths: commitmentMonthsStr } = session.metadata ?? {};
+  if (!userId) return;
   if (session.mode !== "subscription" || !session.subscription) return;
 
   const stripeSubscriptionId =
@@ -78,23 +78,33 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     });
   }
 
+  const commitmentMonths = parseInt(commitmentMonthsStr ?? "0", 10);
+  const commitmentEndDate =
+    commitmentMonths > 0
+      ? new Date(Date.now() + commitmentMonths * 30 * 24 * 60 * 60 * 1000)
+      : null;
+
   await prisma.subscription.upsert({
     where: { subscriberId: userId },
     update: {
-      coachId,
+      coachId: coachId ?? null,
+      plan: plan ?? "ESSENTIELLE",
       stripeSubscriptionId,
       status: stripeSub.status,
       currentPeriodEnd,
       cancelAtPeriodEnd: stripeSub.cancel_at_period_end,
       pendingCoachId: null,
+      ...(commitmentEndDate ? { commitmentEndDate } : {}),
     },
     create: {
       subscriberId: userId,
-      coachId,
+      coachId: coachId ?? null,
+      plan: plan ?? "ESSENTIELLE",
       stripeSubscriptionId,
       status: stripeSub.status,
       currentPeriodEnd,
       cancelAtPeriodEnd: stripeSub.cancel_at_period_end,
+      ...(commitmentEndDate ? { commitmentEndDate } : {}),
     },
   });
 }

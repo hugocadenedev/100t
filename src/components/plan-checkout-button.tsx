@@ -22,7 +22,7 @@ export default function PlanCheckoutButton({
 
   async function handleClick() {
     if (!isAuthenticated) {
-      router.push("/inscription");
+      router.push("/inscription?redirectAfter=%2Foffres");
       return;
     }
 

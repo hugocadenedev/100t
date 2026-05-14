@@ -410,6 +410,8 @@ export default async function CoachPage({ params }: { params: Promise<{ slug: st
                 coachName={coach.displayName}
                 monthlyPrice={PLATFORM_MONTHLY_PRICE}
                 triggerClassName="app-button-accent inline-flex items-center justify-center px-5 py-3 text-xs font-black uppercase tracking-[0.14em]"
+                isAuthenticated={!!user}
+                redirectAfter={`/coach/${coach.slug}`}
               />
             )}
           </div>
