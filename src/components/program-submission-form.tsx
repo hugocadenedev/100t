@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useActionState, useRef, useState } from "react";
+import React, { startTransition, useActionState, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 
@@ -213,13 +213,19 @@ function PdfDropZone({
 
 export function ProgramSubmissionForm({
   submission,
+  onSuccess,
 }: {
   submission?: ProgramSubmission;
+  onSuccess?: () => void;
 }) {
   const [state, formAction] = useActionState(submitProgramAction, initialActionState);
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  React.useEffect(() => {
+    if (state.status === "success" && onSuccess) onSuccess();
+  }, [state.status, onSuccess]);
 
   const handleCoverChange = (file: File | null) => {
     setCoverFile(file);
@@ -409,60 +415,173 @@ export function ProgramSubmissionList({
 }: {
   submissions: ProgramSubmission[];
 }) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
   if (!submissions.length) {
     return (
-      <div className="rounded-[22px] border border-white/5 bg-white/[0.008] p-8 text-sm text-white/60">
-        Aucun dépôt pour le moment. Utilise le formulaire ci-dessus pour soumettre un programme.
+      <div className="rounded-[22px] border border-white/5 bg-white/[0.008] p-8 text-center text-sm text-white/40">
+        Aucun programme soumis pour le moment.
+      </div>
+    );
+  }
+
+  const approved = submissions.filter((s) => s.status === "APPROVED");
+  const pending = submissions.filter((s) => s.status === "PENDING");
+  const rejected = submissions.filter((s) => s.status === "REJECTED");
+
+  function SubmissionCard({ sub }: { sub: ProgramSubmission }) {
+    let equipment: string[] = [];
+    try { equipment = JSON.parse(sub.equipment) as string[]; } catch { /* noop */ }
+    const equipmentLabel = equipment
+      .map((v) => EQUIPMENT_OPTIONS.find((o) => o.value === v)?.label ?? v)
+      .join(", ");
+
+    const isExpanded = expandedId === sub.id;
+    const isEditing = editingId === sub.id;
+
+    return (
+      <article className="overflow-hidden rounded-[24px] border border-white/6 bg-white/[0.008]">
+        {/* Cover */}
+        <div className="relative aspect-[2.8/1] w-full overflow-hidden bg-[#111]">
+          {sub.coverImageUrl ? (
+            <img
+              src={sub.coverImageUrl}
+              alt={sub.title}
+              className="h-full w-full object-cover object-center opacity-80"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-end bg-gradient-to-br from-[#0d0d0d] to-[#1a1a1a] px-8 opacity-30">
+              <span className="font-mono text-[6rem] font-black uppercase leading-none text-white/10">
+                {sub.title.slice(0, 2).toUpperCase()}
+              </span>
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          {/* Status badge */}
+          <div className="absolute right-4 top-4">
+            <span className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${statusStyles[sub.status]}`}>
+              {statusLabels[sub.status]}
+            </span>
+          </div>
+          {/* Title */}
+          <div className="absolute bottom-0 left-0 right-0 px-5 pb-4">
+            <h4 className="text-lg font-black uppercase leading-none tracking-tight text-white">
+              {sub.title}
+            </h4>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="p-5 space-y-4">
+          <p className="line-clamp-2 text-sm leading-6 text-white/55">{sub.description}</p>
+
+          {/* Meta chips */}
+          <div className="flex flex-wrap gap-2">
+            <span className="app-chip px-2.5 py-1 text-[11px]">{programLevelLabels[sub.level]}</span>
+            <span className="app-chip px-2.5 py-1 text-[11px]">{sub.durationMonths} mois</span>
+            <span className="app-chip px-2.5 py-1 text-[11px]">{sub.sessionsPerWeek} séances/sem.</span>
+            <span className="app-chip px-2.5 py-1 text-[11px]">~{sub.avgSessionMinutes} min</span>
+            {equipmentLabel && <span className="app-chip px-2.5 py-1 text-[11px]">{equipmentLabel}</span>}
+            {sub.equipmentFreeText && <span className="app-chip px-2.5 py-1 text-[11px]">{sub.equipmentFreeText}</span>}
+          </div>
+
+          {/* Admin note */}
+          {sub.adminNotes && (
+            <div className="rounded-[14px] border border-rose-400/20 bg-rose-400/8 px-4 py-3 text-sm text-rose-100">
+              <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-rose-300/70">Note de l'administration</p>
+              {sub.adminNotes}
+            </div>
+          )}
+
+          {/* PDF progress bar */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-[11px] text-white/35">
+              <span>PDFs mensuels</span>
+              <span>{sub.pdfs.length}/{sub.durationMonths}</span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+              <div
+                className="h-full rounded-full bg-[var(--accent)] transition-all"
+                style={{ width: `${Math.round((sub.pdfs.length / sub.durationMonths) * 100)}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => setExpandedId(isExpanded ? null : sub.id)}
+              className="rounded-full border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 transition hover:border-white/25 hover:text-white"
+            >
+              {isExpanded ? "Masquer les PDFs ↑" : `Gérer les PDFs (${sub.pdfs.length}/${sub.durationMonths})`}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingId(isEditing ? null : sub.id);
+                setExpandedId(null);
+              }}
+              className="rounded-full border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 transition hover:border-[var(--accent)]/40 hover:text-[var(--accent)]"
+            >
+              {isEditing ? "Annuler la modification" : "Modifier"}
+            </button>
+          </div>
+        </div>
+
+        {/* Expanded PDF manager */}
+        {isExpanded && (
+          <div className="border-t border-white/6 px-5 pb-5 pt-4">
+            <MonthlyPdfManager submission={sub} />
+          </div>
+        )}
+
+        {/* Inline edit form */}
+        {isEditing && (
+          <div className="border-t border-white/6 px-5 pb-5 pt-4">
+            <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--accent)]">Modification du dépôt</p>
+            <ProgramSubmissionForm
+              submission={sub}
+              onSuccess={() => setEditingId(null)}
+            />
+          </div>
+        )}
+      </article>
+    );
+  }
+
+  function Group({ title, items, accent }: { title: string; items: ProgramSubmission[]; accent: string }) {
+    if (!items.length) return null;
+    return (
+      <div className="space-y-4">
+        <p className={`text-[10px] font-bold uppercase tracking-[0.28em] ${accent}`}>{title} · {items.length}</p>
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          {items.map((sub) => <SubmissionCard key={sub.id} sub={sub} />)}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {submissions.map((sub) => {
-        let equipment: string[] = [];
-        try { equipment = JSON.parse(sub.equipment) as string[]; } catch { /* noop */ }
-        const equipmentLabels = equipment
-          .map((v) => EQUIPMENT_OPTIONS.find((o) => o.value === v)?.label ?? v)
-          .join(", ");
-
-        return (
-          <article
-            key={sub.id}
-            className="rounded-[20px] border border-white/5 bg-white/[0.008] p-5"
-          >
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h4 className="text-base font-semibold text-white">{sub.title}</h4>
-                <p className="mt-1 text-sm text-white/56">{sub.description}</p>
-              </div>
-              <span
-                className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wider ${statusStyles[sub.status]}`}
-              >
-                {statusLabels[sub.status]}
-              </span>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2 text-xs text-white/50">
-              <span className="app-chip px-2.5 py-1">{programLevelLabels[sub.level]}</span>
-              <span className="app-chip px-2.5 py-1">{sub.durationMonths} mois</span>
-              <span className="app-chip px-2.5 py-1">{sub.sessionsPerWeek} séances/sem.</span>
-              <span className="app-chip px-2.5 py-1">{sub.avgSessionMinutes} min/séance</span>
-              {equipmentLabels && <span className="app-chip px-2.5 py-1">{equipmentLabels}</span>}
-              {sub.equipmentFreeText && <span className="app-chip px-2.5 py-1">{sub.equipmentFreeText}</span>}
-            </div>
-            {sub.adminNotes ? (
-              <div className="mt-4 rounded-[14px] border border-rose-400/20 bg-rose-400/10 p-3 text-sm text-rose-100">
-                <strong className="text-xs uppercase tracking-wider">Note de l'administration :</strong>
-                <p className="mt-1">{sub.adminNotes}</p>
-              </div>
-            ) : null}
-            <MonthlyPdfManager submission={sub} />
-          </article>
-        );
-      })}
+    <div className="space-y-10">
+      <Group title="Approuvés" items={approved} accent="text-emerald-400" />
+      <Group title="En attente" items={pending} accent="text-amber-400" />
+      {rejected.length > 0 && (
+        <details className="group">
+          <summary className="flex cursor-pointer list-none items-center gap-3 text-[10px] font-bold uppercase tracking-[0.28em] text-rose-400">
+            <span>Refusés · {rejected.length}</span>
+            <span className="text-white/25 group-open:rotate-180 transition-transform">▾</span>
+          </summary>
+          <div className="mt-4 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {rejected.map((sub) => <SubmissionCard key={sub.id} sub={sub} />)}
+          </div>
+        </details>
+      )}
     </div>
   );
 }
+
 
 // ──────────────────────────────────────────────────────────────────────────────
 // MonthlyPdfManager — manage PDFs month by month after submission
