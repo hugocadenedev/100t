@@ -73,3 +73,36 @@ export function difficultyOptions() {
     label,
   }));
 }
+
+/**
+ * Calcule combien de mois du programme sont débloqués pour un abonné,
+ * en partant de la date de début de son abonnement.
+ *
+ * - Mois 1 : disponible dès le premier jour d'abonnement.
+ * - Mois 2 : débloqué le jour du renouvellement mensuel (1 mois après startedAt).
+ * - Mois N : débloqué N-1 mois après startedAt.
+ *
+ * Ex : abonné le 14 mai → mois 2 débloqué le 14 juin, mois 3 le 14 juillet, etc.
+ */
+export function getUnlockedMonths(startedAt: Date, now: Date = new Date()): number {
+  let months =
+    (now.getFullYear() - startedAt.getFullYear()) * 12 +
+    (now.getMonth() - startedAt.getMonth());
+  // Si le jour du mois courant est avant le jour de début, le renouvellement n'a pas encore eu lieu
+  if (now.getDate() < startedAt.getDate()) {
+    months -= 1;
+  }
+  // Mois 1 est toujours disponible (months = 0 → 1 débloqué)
+  return Math.max(1, months + 1);
+}
+
+/**
+ * Retourne la date à laquelle le mois N d'un programme sera débloqué,
+ * calculée à partir de la date de début d'abonnement.
+ * Mois 1 → même jour que startedAt. Mois 2 → startedAt + 1 mois. Etc.
+ */
+export function getMonthUnlockDate(startedAt: Date, monthNumber: number): Date {
+  const d = new Date(startedAt);
+  d.setMonth(d.getMonth() + (monthNumber - 1));
+  return d;
+}

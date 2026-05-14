@@ -2,7 +2,7 @@ import "server-only";
 
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { fullName } from "@/lib/utils";
+import { fullName, getUnlockedMonths } from "@/lib/utils";
 
 type MarketplaceSort = "popular" | "price-asc" | "price-desc" | "newest";
 type MarketplacePrice = "all" | "under-30" | "30-45" | "45-plus";
@@ -340,6 +340,25 @@ export async function getProgramPageData(programId: string) {
       hasLegacyCoachSub,
   );
 
+  // ── Calcul des mois débloqués pour cet abonné ────────────────────────────
+  // Admin et propriétaire voient tout (null = pas de restriction).
+  // Un abonné actif voit les mois débloqués depuis le début de son abonnement.
+  // Sans accès : 0 mois débloqués.
+  let unlockedMonths: number | null = null; // null = tous les mois visibles
+  let subscriptionStartedAt: Date | null = null;
+
+  if (user?.role === "ADMIN" || isOwner) {
+    unlockedMonths = null; // aucune restriction
+  } else if (hasLegacyCoachSub && subscription?.startedAt) {
+    subscriptionStartedAt = subscription.startedAt;
+    unlockedMonths = getUnlockedMonths(subscription.startedAt);
+  } else if (canAccess) {
+    // Accès via monthlySelection mais pas de startedAt connu → tout débloquer
+    unlockedMonths = null;
+  } else {
+    unlockedMonths = 0; // aucun accès
+  }
+
   const coachSlug = program.coach.slug;
 
   const fullProgram = await prisma.program.findUnique({
@@ -398,6 +417,8 @@ export async function getProgramPageData(programId: string) {
       coachName: fullName(fullProgram.coach.user.firstName, fullProgram.coach.user.lastName),
       coachSlug,
       monthlyPdfs: submission?.pdfs ?? [],
+      unlockedMonths,
+      subscriptionStartedAt,
       submissionMeta: submission
         ? {
             durationMonths: submission.durationMonths,

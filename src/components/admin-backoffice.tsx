@@ -93,7 +93,7 @@ type AdminData = {
     coverImageUrl: string | null;
     level: string;
     durationMonths: number;
-    sessionsPerWeek: number;
+    sessionsPerWeek: string;
     avgSessionMinutes: number;
     equipment: string;
     equipmentFreeText: string | null;

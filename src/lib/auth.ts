@@ -11,7 +11,14 @@ const SESSION_COOKIE = "100t_session";
 const SESSION_DURATION_DAYS = 30;
 
 function sessionSecret() {
-  return process.env.SESSION_SECRET || "100t-local-secret";
+  const secret = process.env.SESSION_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("SESSION_SECRET doit être défini en production.");
+    }
+    return "100t-local-dev-secret";
+  }
+  return secret;
 }
 
 export function hashToken(token: string) {

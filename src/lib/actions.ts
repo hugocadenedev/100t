@@ -1576,7 +1576,7 @@ export async function adminReviewProgramSubmissionAction(
           description: `${submission.description}\n\n[Niveau : ${submission.level.replace("_", " ")}] [Durée : ${submission.durationMonths} mois] [${submission.sessionsPerWeek} séances/sem.] [${submission.avgSessionMinutes} min/séance] [Matériel : ${equipmentLabel}]`,
           coverImage: submission.coverImageUrl,
           difficulty: difficulty as "DEBUTANT" | "INTERMEDIAIRE" | "AVANCE" | "EXPERT",
-          totalDurationMinutes: submission.durationMonths * 4 * submission.sessionsPerWeek * submission.avgSessionMinutes,
+          totalDurationMinutes: submission.durationMonths * 4 * (parseInt(submission.sessionsPerWeek, 10) || 3) * submission.avgSessionMinutes,
           isPublished: true,
         },
       });

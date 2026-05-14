@@ -227,7 +227,7 @@ model ProgramSubmission {
   coverImageUrl     String?
   level             ProgramLevel
   durationMonths    Int
-  sessionsPerWeek   Int
+  sessionsPerWeek   String
   avgSessionMinutes Int
   equipment         String           // JSON array of string values
   equipmentFreeText String?

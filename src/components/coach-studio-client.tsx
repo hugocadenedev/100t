@@ -156,7 +156,7 @@ type ProgramSubmission = {
   coverImageUrl: string | null;
   level: ProgramLevelValue;
   durationMonths: number;
-  sessionsPerWeek: number;
+  sessionsPerWeek: string;
   avgSessionMinutes: number;
   equipment: string;
   equipmentFreeText: string | null;

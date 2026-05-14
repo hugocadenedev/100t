@@ -24,7 +24,7 @@ type ProgramSubmission = {
   coverImageUrl: string | null;
   level: ProgramLevelValue;
   durationMonths: number;
-  sessionsPerWeek: number;
+  sessionsPerWeek: string;
   avgSessionMinutes: number;
   equipment: string; // JSON string
   equipmentFreeText: string | null;
@@ -342,10 +342,9 @@ export function ProgramSubmissionForm({
           <label className="text-sm text-white/70">Séances / semaine <span className="text-rose-400">*</span></label>
           <input
             name="sessionsPerWeek"
-            type="number"
-            min={1}
-            max={14}
-            defaultValue={submission?.sessionsPerWeek ?? 3}
+            type="text"
+            placeholder="ex : 3, 4-5, 3 à 4…"
+            defaultValue={submission?.sessionsPerWeek ?? ""}
             className="field"
             required
           />

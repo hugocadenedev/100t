@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { getProgramPageData } from "@/lib/data";
 import type { DifficultyValue, ProgramLevelValue } from "@/lib/domain";
-import { difficultyLabels, formatDuration, programLevelLabels } from "@/lib/utils";
+import { difficultyLabels, formatDate, formatDuration, getMonthUnlockDate, programLevelLabels } from "@/lib/utils";
 
 const difficultyColors: Record<DifficultyValue, string> = {
   DEBUTANT: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
@@ -45,6 +45,8 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
   const { canAccess } = data;
   const program = "program" in data ? data.program : null;
   if (!program) notFound();
+
+  const { unlockedMonths, subscriptionStartedAt } = program;
 
   const equipment = parseEquipment(program.submissionMeta?.equipment);
   const hasPdfs = program.monthlyPdfs.length > 0;
@@ -152,40 +154,87 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
             <p className="text-sm leading-[1.85] text-white/65">{program.description}</p>
           </div>
 
-          {/* Monthly PDFs */}
+          {/* Monthly PDFs – verrouillage progressif par mois d'abonnement */}
           {hasPdfs && (
             <div className="rounded-[22px] border border-white/5 bg-white/[0.02] p-6">
-              <SectionLabel>PDFs mensuels</SectionLabel>
+              <SectionLabel>
+                PDFs mensuels
+                {canAccess && unlockedMonths !== null && (
+                  <span className="ml-2 rounded-full bg-[var(--accent)]/15 px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[var(--accent)]">
+                    Mois {unlockedMonths} débloqué{unlockedMonths > 1 ? "s" : ""}
+                  </span>
+                )}
+              </SectionLabel>
+
               {canAccess ? (
                 <div className="grid gap-3 sm:grid-cols-2">
-                  {program.monthlyPdfs.map((pdf) => (
-                    <a
-                      key={pdf.id}
-                      href={pdf.pdfUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group flex items-center gap-3 rounded-[14px] border border-white/6 bg-white/[0.02] p-4 transition hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/[0.05]"
-                    >
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--accent)]/10 text-[var(--accent)] transition group-hover:bg-[var(--accent)]/20">
-                        <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
-                          <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" />
-                        </svg>
+                  {program.monthlyPdfs.map((pdf) => {
+                    // null = aucune restriction (admin / propriétaire)
+                    const isUnlocked = unlockedMonths === null || pdf.monthNumber <= unlockedMonths;
+                    const unlockDate =
+                      !isUnlocked && subscriptionStartedAt
+                        ? getMonthUnlockDate(subscriptionStartedAt, pdf.monthNumber)
+                        : null;
+
+                    if (isUnlocked) {
+                      return (
+                        <a
+                          key={pdf.id}
+                          href={pdf.pdfUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center gap-3 rounded-[14px] border border-white/6 bg-white/[0.02] p-4 transition hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/[0.05]"
+                        >
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--accent)]/10 text-[var(--accent)] transition group-hover:bg-[var(--accent)]/20">
+                            <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
+                              <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" />
+                            </svg>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-white">
+                              {pdf.label ?? `Mois ${pdf.monthNumber}`}
+                            </p>
+                            <p className="text-[11px] text-white/35 transition group-hover:text-[var(--accent)]">
+                              Télécharger →
+                            </p>
+                          </div>
+                        </a>
+                      );
+                    }
+
+                    // PDF verrouillé
+                    return (
+                      <div
+                        key={pdf.id}
+                        className="flex items-center gap-3 rounded-[14px] border border-white/4 bg-white/[0.01] p-4 opacity-60"
+                      >
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/8 bg-white/[0.03] text-white/25">
+                          <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-white/40">
+                            {pdf.label ?? `Mois ${pdf.monthNumber}`}
+                          </p>
+                          <p className="text-[11px] text-white/25">
+                            {unlockDate
+                              ? `Disponible le ${formatDate(unlockDate)}`
+                              : `Disponible au mois ${pdf.monthNumber}`}
+                          </p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-white">
-                          {pdf.label ?? `Mois ${pdf.monthNumber}`}
-                        </p>
-                        <p className="text-[11px] text-white/35 transition group-hover:text-[var(--accent)]">
-                          Télécharger →
-                        </p>
-                      </div>
-                    </a>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="rounded-[14px] border border-white/6 bg-white/[0.02] p-5 text-center">
-                  <p className="text-xs text-white/35">🔒 {program.monthlyPdfs.length} PDF{program.monthlyPdfs.length > 1 ? "s" : ""} disponible{program.monthlyPdfs.length > 1 ? "s" : ""} pour les abonnés</p>
-                  <Link href={`/coach/${program.coachSlug}`} className="mt-3 inline-block text-xs font-semibold text-[var(--accent)] hover:underline">S&apos;abonner pour y accéder →</Link>
+                  <p className="text-xs text-white/35">
+                    🔒 {program.monthlyPdfs.length} PDF{program.monthlyPdfs.length > 1 ? "s" : ""} disponible{program.monthlyPdfs.length > 1 ? "s" : ""} pour les abonnés
+                  </p>
+                  <Link href={`/coach/${program.coachSlug}`} className="mt-3 inline-block text-xs font-semibold text-[var(--accent)] hover:underline">
+                    S&apos;abonner pour y accéder →
+                  </Link>
                 </div>
               )}
             </div>

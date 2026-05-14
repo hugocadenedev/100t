@@ -11,17 +11,38 @@ pouvoir glisse déposer toutes les images
 
 //l'administrateur reçoit la demande de publication de programme, et c'est lui qui dis si oui ou non le programme est publié// 
 
-Mettre le back office admin en vrai back office de gestion plus clair (Style qoryo)
+//Mettre le back office admin en vrai back office de gestion plus clair (Style qoryo)//
 
 Pouvoir s'abonner depuis la page offre
 
 Sortir Option annuelle comptant dans l'offre à  239€/an 
 
-Rajouter une belle page de présenation de programme 
+// Rajouter une belle page de présenation de programme //
 
 Regarder avec Stripe connect pour reverser la commision  
 
 
+RDV JEUDI 
 
-    
+Mettre un produit à la boutique 
 
+
+// une fois payé par stripe, ça me débloque pas mon abonnement à mon coach //
+
+// Nom coach   toujours coupé //
+
+// Mettre plus en avant les programmes sur la page coach//  
+
+// Rajouter on onglet "Candidature coach' //
+
+// Dans inscription, choisir si coach ou client avant d'afficher les champs du formulaire //
+
+// Faire matcher abonnement/fonctionnalité //
+
+//Sortir le nombre d'heure sur l'affichage d'un programme sur la page coach //
+
+//Sur le récap prévisionnalisation sur page coach, titre, nombre dentrainement par semaine, durée totale du programme en mois, niveau //
+
+//En titre sur la page d'accueil on met : Un abonnement tout compris. et en sous texte : les meilleurs coach accéssible en un clic //
+
+// Et autre part sur la page d'accueil il faut qu'il y ai écris, simple/flexible et sans engagmenet // 

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { getMarketplaceData } from "@/lib/data";
+import { VideoStories } from "@/components/video-stories";
 
 const aboutImage =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuC9Nwzhmqo4w0jp0dQFggQbwCsIm_IPtsP-m2RrsyQTpqdbx5NaKf7UkRv8JOPv8FnUBePyTtPiX6amwHK58Ehv7w2dyNQSAhL-HgiAQrKRLa87ebvIiA75-_eYCyA90yLA0PcxUKrmlAemeGkdZakpn0DhNJs-KuzcHzMBYLIfNlI-gtFFfe1Js-whvJgCBR0LoJunkqLlPvfS0PAX9wuPoHlb5p_DnYp7v5yFz1f6Z_YBhfw43w-mLSwMrrbRRX-uJmozvls_jH6I";
@@ -85,6 +86,22 @@ export default async function Home() {
               <div className="mt-2 text-[10px] uppercase tracking-[0.18em] text-white/38">Programmes publiés</div>
             </article>
           </div>
+        </div>
+      </section>
+
+      {/* ── Ce qu'on dit de nous – story bubbles ── */}
+      <section className="border-t border-white/8 bg-[#080808] px-4 py-16 md:px-10 md:py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-12 text-center">
+            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--accent)]">Témoignages</p>
+            <h2 className="font-condensed mt-4 text-[2.8rem] font-semibold uppercase leading-[0.9] tracking-[-0.04em] text-white md:text-[4.2rem]">
+              Ce qu'on dit de nous.
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-sm text-white/45">
+              Ils ont testé. Ils témoignent.
+            </p>
+          </div>
+          <VideoStories />
         </div>
       </section>
 
