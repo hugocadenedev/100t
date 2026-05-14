@@ -15,6 +15,7 @@ jobs:
         run: |
           set -e
           cd /var/www/100t
+          git checkout -- next-env.d.ts 2>/dev/null || true
           git pull origin main
           npm ci
           npx prisma generate
