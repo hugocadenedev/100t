@@ -1,11 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import faqPhoto from "../../47AF34C4-9B7F-4CA8-83D5-F52946F0DB9A_L0_001-04_11_2024 11_57_37.jpg";
+import footerLogo from "../../WhatsApp_Image_2026-07-01_at_22.10.13-removebg-preview.png";
+
 import { getMarketplaceData } from "@/lib/data";
 import { VideoStories } from "@/components/video-stories";
 
-const aboutImage =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuC9Nwzhmqo4w0jp0dQFggQbwCsIm_IPtsP-m2RrsyQTpqdbx5NaKf7UkRv8JOPv8FnUBePyTtPiX6amwHK58Ehv7w2dyNQSAhL-HgiAQrKRLa87ebvIiA75-_eYCyA90yLA0PcxUKrmlAemeGkdZakpn0DhNJs-KuzcHzMBYLIfNlI-gtFFfe1Js-whvJgCBR0LoJunkqLlPvfS0PAX9wuPoHlb5p_DnYp7v5yFz1f6Z_YBhfw43w-mLSwMrrbRRX-uJmozvls_jH6I";
+const aboutImage = faqPhoto;
 
 const faqItems = [
   {
@@ -49,13 +51,12 @@ export default async function Home() {
   const { coaches, disciplines } = await getMarketplaceData();
   const featuredCoaches = coaches.slice(0, 4);
   const featuredDisciplines = disciplines.slice(0, 4);
-  const totalPrograms = coaches.reduce((sum: number, coach: (typeof coaches)[number]) => sum + coach._count.programs, 0);
 
   return (
     <div className="bg-[var(--background)] text-slate-100">
       <section className="relative overflow-hidden px-4 pb-18 pt-16 md:px-10 md:pb-24 md:pt-24">
         <div className="absolute inset-x-0 top-0 h-64 bg-[radial-gradient(ellipse_at_top_left,rgba(207,253,90,0.13),transparent_50%)]" />
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+        <div className="mx-auto max-w-7xl">
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--accent)]">
               Marketplace coaching sport et performance
@@ -70,7 +71,7 @@ export default async function Home() {
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               {["SIMPLE", "FLEXIBLE", "SANS ENGAGEMENT"].map((tag) => (
-                <span key={tag} className="rounded-full border border-white/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-white/45">
+                <span key={tag} className="rounded-full border border-white/70 bg-white px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-black/78">
                   {tag}
                 </span>
               ))}
@@ -83,23 +84,6 @@ export default async function Home() {
                 Trouver un coach
               </Link>
             </div>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            <article className="app-panel-soft rounded-[28px] p-5 sm:col-span-2">
-              <div className="text-[10px] uppercase tracking-[0.18em] text-white/38">Positionnement</div>
-              <p className="mt-3 max-w-md text-sm leading-6 text-white/70">
-                Un coaching de qualité, sans engagement. Une plateforme claire pour choisir un coach, sélectionner le bon programme et progresser sans friction.
-              </p>
-            </article>
-            <article className="app-panel-soft rounded-[28px] p-5">
-              <div className="font-condensed text-5xl leading-none tracking-tight text-[var(--accent)]">{coaches.length}</div>
-              <div className="mt-2 text-[10px] uppercase tracking-[0.18em] text-white/38">Coachs visibles</div>
-            </article>
-            <article className="app-panel-soft rounded-[28px] p-5">
-              <div className="font-condensed text-5xl leading-none tracking-tight text-[var(--accent)]">{totalPrograms}</div>
-              <div className="mt-2 text-[10px] uppercase tracking-[0.18em] text-white/38">Programmes publiés</div>
-            </article>
           </div>
         </div>
       </section>
@@ -120,26 +104,26 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="border-t border-white/8 bg-black px-4 py-18 md:px-10 md:py-24">
+      <section className="border-t border-black/8 bg-[#f6f5f1] px-4 py-18 text-[#111111] md:px-10 md:py-24">
         <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-4xl">
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--accent)]">Sports et catégories</p>
-              <h2 className="font-condensed mt-4 text-[2.8rem] font-semibold uppercase leading-[0.9] tracking-[-0.04em] text-white md:text-[4.7rem]">
-                Les sports les plus
+              <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#5c6b1f]">Sports et catégories</p>
+              <h2 className="font-condensed mt-4 text-[2.8rem] font-semibold uppercase leading-[0.9] tracking-[-0.04em] text-[#111111] md:text-[4.7rem]">
+                Choisis ton coach
                 <br />
-                demandés.
+                en fonction de ton objectif.
               </h2>
+              <p className="mt-5 max-w-2xl text-sm leading-6 text-black/62 md:text-base">
+                Compare les profils, choisis le coach qui correspond à ton objectif et accède à ton programme en moins de 5 minutes, sans parcours compliqué.
+              </p>
             </div>
-            <p className="max-w-xl text-sm leading-6 text-white/62 md:text-base">
-              Chaque univers mène vers une sélection de coachs et de programmes. On sort d'une logique “bloc brutal” pour une lecture plus simple, plus directe et plus premium.
-            </p>
           </div>
 
           <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             {featuredCoaches.map((coach: (typeof featuredCoaches)[number], index: number) => (
-              <article key={coach.id} className="group overflow-hidden rounded-[30px] border border-white/8 bg-[#0d0d0d]">
-                <div className="relative aspect-[0.82] overflow-hidden bg-[#111111]">
+              <article key={coach.id} className="group overflow-hidden rounded-[30px] border border-black/8 bg-white shadow-[0_16px_34px_rgba(0,0,0,0.06)]">
+                <div className="relative aspect-[0.82] overflow-hidden bg-[#e8e5dc]">
                   {coach.photoUrl ? (
                     <Image
                       src={coach.photoUrl}
@@ -148,21 +132,21 @@ export default async function Home() {
                       className="object-cover object-center opacity-88 transition duration-500 group-hover:scale-[1.03]"
                     />
                   ) : null}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/18 to-transparent" />
-                  <div className="absolute left-4 top-4 rounded-full bg-black/65 px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-white/72 backdrop-blur-md">
+                  <div className="absolute inset-0 bg-gradient-to-t from-[rgba(17,17,17,0.82)] via-[rgba(17,17,17,0.08)] to-transparent" />
+                  <div className="absolute left-4 top-4 rounded-full bg-white/84 px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-black/70 backdrop-blur-md">
                     {featuredDisciplines[index] || coach.discipline}
                   </div>
                 </div>
                 <div className="p-5">
-                  <h3 className="font-condensed text-[2rem] uppercase leading-none tracking-[-0.03em] text-white">
+                  <h3 className="font-condensed text-[2rem] uppercase leading-none tracking-[-0.03em] text-[#111111]">
                     {coach.discipline}
                   </h3>
-                  <p className="mt-3 line-clamp-3 text-sm leading-6 text-white/62">
+                  <p className="mt-3 line-clamp-3 text-sm leading-6 text-black/62">
                     {coach.headline}
                   </p>
                   <Link
                     href={`/coach/${coach.slug}`}
-                    className="mt-5 inline-flex text-sm font-semibold text-white underline underline-offset-4 transition hover:text-[var(--accent)]"
+                    className="mt-5 inline-flex text-sm font-semibold text-[#111111] underline underline-offset-4 transition hover:text-[#5c6b1f]"
                   >
                     Voir plus
                   </Link>
@@ -174,41 +158,49 @@ export default async function Home() {
       </section>
 
       <section className="border-t border-white/8 bg-[#f6f5f1] px-4 py-18 text-[#111111] md:px-10 md:py-24">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-          <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#5c6b1f]">Comment ça marche</p>
+        <div className="mx-auto max-w-7xl">
+          <div className="max-w-4xl">
+            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#5c6b1f]">Mini tuto</p>
             <h2 className="font-condensed mt-4 text-[2.8rem] font-semibold uppercase leading-[0.92] tracking-[-0.04em] md:text-[4.8rem]">
-              Une plateforme claire,
+              Commence
               <br />
-              sans friction.
+              en 3 étapes.
             </h2>
-            <p className="mt-5 max-w-xl text-base leading-7 text-black/68">
-              Compare les profils, lis l'expérience, ouvre la page publique du coach et abonne-toi seulement à l'offre qui te correspond. Rien d'obscur, rien de sur-designé.
+            <p className="mt-5 max-w-2xl text-base leading-7 text-black/68">
+              Un parcours rapide, lisible et direct pour choisir ton coach, activer ton offre et démarrer ton entraînement sans perte de temps.
             </p>
-            <div className="mt-8 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-[24px] border border-black/8 bg-white px-4 py-5">
-                <div className="font-condensed text-4xl leading-none">01</div>
-                <div className="mt-2 text-xs uppercase tracking-[0.16em] text-black/54">Explorer</div>
-              </div>
-              <div className="rounded-[24px] border border-black/8 bg-white px-4 py-5">
-                <div className="font-condensed text-4xl leading-none">02</div>
-                <div className="mt-2 text-xs uppercase tracking-[0.16em] text-black/54">Comparer</div>
-              </div>
-              <div className="rounded-[24px] border border-black/8 bg-white px-4 py-5">
-                <div className="font-condensed text-4xl leading-none">03</div>
-                <div className="mt-2 text-xs uppercase tracking-[0.16em] text-black/54">S'abonner</div>
-              </div>
-            </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-[34px] border border-black/8 bg-white p-3 shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
-            <div className="relative aspect-[1.05] overflow-hidden rounded-[28px] bg-black">
-              <Image src={aboutImage} alt="Séance 100T" fill className="object-cover" />
-            </div>
-            <div className="absolute bottom-7 left-7 rounded-[18px] bg-[var(--accent)] px-4 py-3 text-black shadow-[0_12px_30px_rgba(0,0,0,0.12)]">
-              <div className="font-condensed text-3xl leading-none">{disciplines.length}</div>
-              <div className="mt-1 text-[10px] uppercase tracking-[0.16em]">disciplines actives</div>
-            </div>
+          <div className="mt-10 grid gap-4 lg:grid-cols-3">
+            <article className="rounded-[28px] border border-black/8 bg-white px-5 py-6 shadow-[0_16px_34px_rgba(0,0,0,0.06)]">
+              <div className="font-condensed text-5xl leading-none text-[#111111]">01</div>
+              <h3 className="mt-5 text-xl font-black uppercase tracking-tight text-[#111111]">
+                Choisi ton coach en 1 clic
+              </h3>
+              <p className="mt-3 text-sm leading-6 text-black/62">
+                Parcours les profils, trouve l'approche qui te correspond et ouvre la page du coach qui colle à ton objectif.
+              </p>
+            </article>
+
+            <article className="rounded-[28px] border border-black/8 bg-[var(--accent)] px-5 py-6 text-black shadow-[0_16px_34px_rgba(0,0,0,0.06)]">
+              <div className="font-condensed text-5xl leading-none">02</div>
+              <h3 className="mt-5 text-xl font-black uppercase tracking-tight">
+                Selectionne ton offre
+              </h3>
+              <p className="mt-3 text-sm leading-6 text-black/72">
+                Choisis la formule qui te convient et valide ton accès en quelques secondes avec un parcours simple.
+              </p>
+            </article>
+
+            <article className="rounded-[28px] border border-black/8 bg-white px-5 py-6 shadow-[0_16px_34px_rgba(0,0,0,0.06)]">
+              <div className="font-condensed text-5xl leading-none text-[#111111]">03</div>
+              <h3 className="mt-5 text-xl font-black uppercase tracking-tight text-[#111111]">
+                Commence à t'entrainer
+              </h3>
+              <p className="mt-3 text-sm leading-6 text-black/62">
+                Accède directement à ton programme, retrouve tes contenus et démarre ton entraînement immédiatement.
+              </p>
+            </article>
           </div>
         </div>
       </section>
@@ -232,14 +224,14 @@ export default async function Home() {
             </Link>
           </div>
 
-          <div className="grid gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
-            <div className="relative overflow-hidden rounded-[30px] bg-white/30 p-2">
-              <div className="relative aspect-[0.86] overflow-hidden rounded-[24px] bg-white/20">
+          <div className="grid gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-stretch">
+            <div className="relative overflow-hidden rounded-[30px] bg-white/30 p-2 lg:self-stretch">
+              <div className="relative min-h-[420px] overflow-hidden rounded-[24px] bg-white/20 lg:h-full">
                 <Image src={aboutImage} alt="Coach 100T" fill className="object-cover" />
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="flex h-full flex-col gap-4">
               {faqItems.map((item, index) => (
                 <details key={item.question} className="faq-item" open={index === 0}>
                   <summary className="flex items-center justify-between gap-4 px-6 py-5 text-base font-semibold">
@@ -258,7 +250,7 @@ export default async function Home() {
         <div className="mb-16 grid grid-cols-1 gap-10 md:grid-cols-4">
           <div className="col-span-1 md:col-span-2">
             <div className="mb-5">
-              <Image src="/logo100t.png" alt="100T" width={128} height={38} className="h-10 w-auto" />
+              <FooterMark />
             </div>
             <p className="mb-8 max-w-xs text-slate-400">
               La marketplace française pour l'entraînement athlétique par abonnement entre abonnés motivés et coachs professionnels.
@@ -322,6 +314,14 @@ export default async function Home() {
           <p className="font-mono text-[10px] uppercase tracking-widest text-slate-500">Conçu pour les infatigables.</p>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function FooterMark() {
+  return (
+    <div aria-label="Logo 100T symbole" className="inline-flex items-center justify-center">
+      <Image src={footerLogo} alt="100T" className="h-14 w-auto md:h-16" />
     </div>
   );
 }

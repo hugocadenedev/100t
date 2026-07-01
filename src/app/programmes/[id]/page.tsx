@@ -155,14 +155,14 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
         {/* ── LEFT ── */}
         <div className="space-y-5">
           {/* Description */}
-          <div className="rounded-[22px] border border-white/5 bg-white/[0.02] p-6">
+          <div className="rounded-[22px] border border-black/8 bg-white p-6 shadow-[0_18px_40px_rgba(0,0,0,0.06)]">
             <SectionLabel>À propos du programme</SectionLabel>
-            <p className="text-sm leading-[1.85] text-white/65">{program.description}</p>
+            <p className="text-sm leading-[1.85] text-black/72">{program.description}</p>
           </div>
 
           {/* Monthly PDFs – verrouillage progressif par mois d'abonnement */}
           {hasPdfs && (
-            <div className="rounded-[22px] border border-white/5 bg-white/[0.02] p-6">
+            <div className="rounded-[22px] border border-black/8 bg-white p-6 shadow-[0_18px_40px_rgba(0,0,0,0.06)]">
               <SectionLabel>
                 PDFs mensuels
                 {canAccess && unlockedMonths !== null && (
@@ -189,7 +189,7 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
                           href={pdf.pdfUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="group flex items-center gap-3 rounded-[14px] border border-white/6 bg-white/[0.02] p-4 transition hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/[0.05]"
+                          className="group flex items-center gap-3 rounded-[14px] border border-black/8 bg-[#f8f8f5] p-4 transition hover:border-[var(--accent)]/55 hover:bg-[var(--accent)]/10"
                         >
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--accent)]/10 text-[var(--accent)] transition group-hover:bg-[var(--accent)]/20">
                             <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
@@ -197,10 +197,10 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
                             </svg>
                           </div>
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-white">
+                            <p className="truncate text-sm font-semibold text-[#111111]">
                               {pdf.label ?? `Mois ${pdf.monthNumber}`}
                             </p>
-                            <p className="text-[11px] text-white/35 transition group-hover:text-[var(--accent)]">
+                            <p className="text-[11px] text-black/45 transition group-hover:text-[#516b15]">
                               Télécharger →
                             </p>
                           </div>
@@ -212,18 +212,18 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
                     return (
                       <div
                         key={pdf.id}
-                        className="flex items-center gap-3 rounded-[14px] border border-white/4 bg-white/[0.01] p-4 opacity-60"
+                        className="flex items-center gap-3 rounded-[14px] border border-black/8 bg-[#f3f3ee] p-4 opacity-80"
                       >
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/8 bg-white/[0.03] text-white/25">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-black/10 bg-white text-black/30">
                           <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
                             <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                           </svg>
                         </div>
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold text-white/40">
+                          <p className="truncate text-sm font-semibold text-black/55">
                             {pdf.label ?? `Mois ${pdf.monthNumber}`}
                           </p>
-                          <p className="text-[11px] text-white/25">
+                          <p className="text-[11px] text-black/40">
                             {unlockDate
                               ? `Disponible le ${formatDate(unlockDate)}`
                               : `Disponible au mois ${pdf.monthNumber}`}
@@ -234,8 +234,8 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
                   })}
                 </div>
               ) : (
-                <div className="rounded-[14px] border border-white/6 bg-white/[0.02] p-5 text-center">
-                  <p className="text-xs text-white/35">
+                <div className="rounded-[14px] border border-black/8 bg-[#f8f8f5] p-5 text-center">
+                  <p className="text-xs text-black/50">
                     🔒 {program.monthlyPdfs.length} PDF{program.monthlyPdfs.length > 1 ? "s" : ""} disponible{program.monthlyPdfs.length > 1 ? "s" : ""} pour les abonnés
                   </p>
                   <Link href={subscribeHref} className="mt-3 inline-block text-xs font-semibold text-[var(--accent)] hover:underline">
@@ -248,7 +248,7 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
 
           {/* Single PDF */}
           {!hasPdfs && program.pdfUrl && (
-            <div className="rounded-[22px] border border-white/5 bg-white/[0.02] p-6">
+            <div className="rounded-[22px] border border-black/8 bg-white p-6 shadow-[0_18px_40px_rgba(0,0,0,0.06)]">
               <SectionLabel>Programme PDF</SectionLabel>
               {canAccess ? (
               <a
@@ -263,8 +263,8 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
                 Ouvrir le PDF
               </a>
               ) : (
-                <div className="rounded-[14px] border border-white/6 bg-white/[0.02] p-5 text-center">
-                  <p className="text-xs text-white/35">🔒 PDF disponible pour les abonnés</p>
+                <div className="rounded-[14px] border border-black/8 bg-[#f8f8f5] p-5 text-center">
+                  <p className="text-xs text-black/50">🔒 PDF disponible pour les abonnés</p>
                   <Link href={subscribeHref} className="mt-3 inline-block text-xs font-semibold text-[var(--accent)] hover:underline">S&apos;abonner pour y accéder →</Link>
                 </div>
               )}
@@ -283,7 +283,7 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
                 (session: (typeof program.workoutSessions)[number], index: number) => (
                   <details
                     key={session.id}
-                    className="group overflow-hidden rounded-[22px] border border-white/5 bg-white/[0.02] transition open:border-white/8"
+                    className="group overflow-hidden rounded-[22px] border border-black/8 bg-white shadow-[0_18px_40px_rgba(0,0,0,0.06)] transition open:border-black/12"
                     open={index === 0}
                   >
                     <summary className="flex cursor-pointer select-none list-none items-start gap-4 p-5">
@@ -293,43 +293,43 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
                       </div>
                       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-sm font-bold uppercase tracking-tight text-white">
+                          <h3 className="text-sm font-bold uppercase tracking-tight text-[#111111]">
                             {session.title}
                           </h3>
                           <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${difficultyColors[session.difficulty as DifficultyValue]}`}>
                             {difficultyLabels[session.difficulty as DifficultyValue]}
                           </span>
-                          <span className="text-xs text-white/35">
+                          <span className="text-xs text-black/40">
                             {formatDuration(session.durationMinutes)}
                           </span>
                         </div>
                         {session.description ? (
-                          <p className="text-xs leading-5 text-white/45">{session.description}</p>
+                          <p className="text-xs leading-5 text-black/55">{session.description}</p>
                         ) : null}
                         {/* Exercise preview chips when collapsed */}
                         <div className="flex flex-wrap gap-1.5 group-open:hidden">
                           {session.exerciseBlocks
                             .slice(0, 4)
                             .map((b: (typeof session.exerciseBlocks)[number]) => (
-                              <span key={b.id} className="rounded-full bg-white/[0.04] px-2.5 py-0.5 text-[10px] text-white/40">
+                              <span key={b.id} className="rounded-full bg-black/[0.04] px-2.5 py-0.5 text-[10px] text-black/55">
                                 {b.name}
                               </span>
                             ))}
                           {session.exerciseBlocks.length > 4 && (
-                            <span className="rounded-full bg-white/[0.04] px-2.5 py-0.5 text-[10px] text-white/25">
+                            <span className="rounded-full bg-black/[0.04] px-2.5 py-0.5 text-[10px] text-black/35">
                               +{session.exerciseBlocks.length - 4} exercices
                             </span>
                           )}
                         </div>
                       </div>
                       {/* Toggle */}
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/8 text-xs font-bold text-white/30 transition group-open:rotate-45 group-open:border-white/15 group-open:text-white/60">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-black/10 text-xs font-bold text-black/35 transition group-open:rotate-45 group-open:border-black/15 group-open:text-black/65">
                         +
                       </div>
                     </summary>
 
                     {/* Expanded content */}
-                    <div className="border-t border-white/5 px-5 pb-5 pt-4">
+                    <div className="border-t border-black/6 px-5 pb-5 pt-4">
                       {session.videoUrl ? (
                         <div className="mb-4 overflow-hidden rounded-[16px]">
                           <iframe
@@ -345,7 +345,7 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
                       {session.exerciseBlocks.length > 0 && (
                         <div className="space-y-1.5">
                           {/* Column headers */}
-                          <div className="hidden grid-cols-[1fr_52px_80px_60px] gap-3 px-3 pb-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-white/20 sm:grid">
+                          <div className="hidden grid-cols-[1fr_52px_80px_60px] gap-3 px-3 pb-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-black/30 sm:grid">
                             <span>Exercice</span>
                             <span className="text-center">Séries</span>
                             <span className="text-center">Reps</span>
@@ -355,13 +355,13 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
                             (block: (typeof session.exerciseBlocks)[number], bi: number) => (
                               <div
                                 key={block.id}
-                                className={`rounded-[12px] p-3 ${bi % 2 === 0 ? "bg-white/[0.025]" : "bg-transparent"}`}
+                                className={`rounded-[12px] p-3 ${bi % 2 === 0 ? "bg-black/[0.035]" : "bg-transparent"}`}
                               >
                                 <div className="flex flex-col gap-2 sm:grid sm:grid-cols-[1fr_52px_80px_60px] sm:items-center sm:gap-3">
                                   <div>
-                                    <p className="text-sm font-semibold text-white">{block.name}</p>
+                                    <p className="text-sm font-semibold text-[#111111]">{block.name}</p>
                                     {block.notes ? (
-                                      <p className="mt-0.5 text-xs text-white/35">{block.notes}</p>
+                                      <p className="mt-0.5 text-xs text-black/45">{block.notes}</p>
                                     ) : null}
                                   </div>
                                   <div className="flex gap-2 sm:contents">
@@ -394,8 +394,8 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
 
           {/* Empty state */}
           {totalSessions === 0 && !hasPdfs && !program.pdfUrl && (
-            <div className="rounded-[22px] border border-white/5 bg-white/[0.02] p-8 text-center">
-              <p className="text-sm text-white/40">Ce programme ne contient pas encore de séances en ligne.</p>
+            <div className="rounded-[22px] border border-black/8 bg-white p-8 text-center shadow-[0_18px_40px_rgba(0,0,0,0.06)]">
+              <p className="text-sm text-black/50">Ce programme ne contient pas encore de séances en ligne.</p>
             </div>
           )}
         </div>
@@ -403,7 +403,7 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
         {/* ── SIDEBAR ── */}
         <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
           {/* Details */}
-          <div className="rounded-[22px] border border-white/5 bg-white/[0.02] p-5">
+          <div className="rounded-[22px] border border-black/8 bg-white p-5 shadow-[0_18px_40px_rgba(0,0,0,0.06)]">
             <SectionLabel>Caractéristiques</SectionLabel>
             <dl className="space-y-0">
               <InfoRow
@@ -432,11 +432,11 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
 
           {/* Equipment */}
           {equipment.length > 0 && (
-            <div className="rounded-[22px] border border-white/5 bg-white/[0.02] p-5">
+            <div className="rounded-[22px] border border-black/8 bg-white p-5 shadow-[0_18px_40px_rgba(0,0,0,0.06)]">
               <SectionLabel>Matériel requis</SectionLabel>
               <div className="flex flex-wrap gap-2">
                 {equipment.map((eq) => (
-                  <span key={eq} className="rounded-full border border-white/8 bg-white/[0.04] px-3 py-1 text-xs font-medium text-white/60">
+                  <span key={eq} className="rounded-full border border-black/10 bg-black/[0.04] px-3 py-1 text-xs font-medium text-black/65">
                     {equipmentLabels[eq] ?? eq}
                   </span>
                 ))}
@@ -447,16 +447,16 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
           {/* Coach card */}
           <Link
             href={`/coach/${program.coachSlug}`}
-            className="group flex items-center gap-3 rounded-[22px] border border-white/5 bg-white/[0.02] p-5 transition hover:border-white/10"
+            className="group flex items-center gap-3 rounded-[22px] border border-black/8 bg-white p-5 shadow-[0_18px_40px_rgba(0,0,0,0.06)] transition hover:border-black/12"
           >
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--accent)]/10 font-mono text-base font-black uppercase text-[var(--accent)]">
               {program.coachName.slice(0, 1)}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] uppercase tracking-widest text-white/30">Coach</p>
-              <p className="truncate text-sm font-bold text-white">{program.coachName}</p>
+              <p className="text-[10px] uppercase tracking-widest text-black/35">Coach</p>
+              <p className="truncate text-sm font-bold text-[#111111]">{program.coachName}</p>
             </div>
-            <span className="text-xs text-white/15 transition group-hover:text-white/50">→</span>
+            <span className="text-xs text-black/20 transition group-hover:text-black/55">→</span>
           </Link>
         </div>
       </div>
@@ -476,20 +476,20 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 border-b border-white/4 py-2.5 last:border-0">
-      <dt className="text-xs text-white/40">{label}</dt>
-      <dd className="text-right text-sm font-semibold text-white">{value}</dd>
+    <div className="flex items-baseline justify-between gap-3 border-b border-black/6 py-2.5 last:border-0">
+      <dt className="text-xs text-black/45">{label}</dt>
+      <dd className="text-right text-sm font-semibold text-[#111111]">{value}</dd>
     </div>
   );
 }
 
 function ExercisePill({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col items-center rounded-lg border border-white/6 bg-white/[0.03] px-3 py-1.5 text-center sm:items-end sm:rounded-none sm:border-none sm:bg-transparent sm:p-0 sm:text-right">
-      <span className="text-[9px] font-medium uppercase tracking-[0.15em] text-white/25 sm:hidden">
+    <div className="flex flex-col items-center rounded-lg border border-black/8 bg-black/[0.03] px-3 py-1.5 text-center sm:items-end sm:rounded-none sm:border-none sm:bg-transparent sm:p-0 sm:text-right">
+      <span className="text-[9px] font-medium uppercase tracking-[0.15em] text-black/40 sm:hidden">
         {label}
       </span>
-      <span className="text-sm font-bold text-white">{value}</span>
+      <span className="text-sm font-bold text-[#111111]">{value}</span>
     </div>
   );
 }

@@ -139,7 +139,7 @@ export default async function OffresPage() {
             </div>
             <div className="space-y-4">
               <div className="flex flex-wrap items-center gap-3">
-                <span className={`${offer.accent ? "app-chip-accent" : "light-chip"} px-3 py-1.5 text-xs font-black uppercase tracking-[0.12em]`}>
+                <span className={`${offer.accent ? "rounded-full bg-black text-[var(--accent)]" : "light-chip"} px-3 py-1.5 text-xs font-black uppercase tracking-[0.12em]`}>
                   {offer.name}
                 </span>
                 {offer.eyebrow ? (
@@ -175,7 +175,7 @@ export default async function OffresPage() {
                 <PlanCheckoutButton
                   plan={offer.planKey}
                   isAuthenticated={isAuthenticated}
-                  className={`${offer.accent ? "app-button-accent" : "app-button-ghost"} inline-flex items-center justify-center px-5 py-2.5 text-xs font-black uppercase tracking-[0.16em] transition ${offer.accent ? "hover:opacity-90" : "border-black/10 bg-black text-white hover:bg-black/90"}`}
+                  className={`${offer.accent ? "app-button-accent hover:opacity-90" : "rounded-full border border-black bg-black text-white hover:bg-black/90"} inline-flex items-center justify-center px-5 py-2.5 text-xs font-black uppercase tracking-[0.16em] transition`}
                 >
                   Choisir cette formule
                 </PlanCheckoutButton>

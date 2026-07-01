@@ -93,56 +93,111 @@ export default async function CoachPage({ params }: { params: Promise<{ slug: st
   return (
     <div className="min-h-screen bg-[#f8f7f2] text-[#101010]">
       <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-        <section className="border-b border-black/8 pb-6 pt-2">
-          <div className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
-            <div>
-              <div className="accent-text-shadow inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/75 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#6b7f20]">
-                <span className="h-2 w-2 rounded-full bg-[var(--accent)]" />
-                Coach certifié
-              </div>
-              <h1 className="mt-4 text-[2.35rem] font-black uppercase leading-[0.92] tracking-[-0.04em] text-[#101010] md:text-[3rem] lg:text-[3.35rem]">
-                {coach.displayName}
-              </h1>
-              <p className="accent-text-shadow mt-1.5 text-sm font-semibold text-[var(--accent)] md:text-base">{coach.discipline}</p>
-              <p className="mt-3 max-w-xl text-sm leading-7 text-black/64 md:text-[15px]">
-                {coachSummary}
-              </p>
+        <section className="overflow-hidden rounded-[22px] border border-black/8 bg-white shadow-[0_18px_45px_rgba(0,0,0,0.06)] sm:rounded-[28px]">
+          <div className="relative h-[150px] overflow-hidden sm:h-[170px] md:h-[190px] lg:h-[210px]">
+            {coach.coverImageUrl ? (
+              <>
+                <Image
+                  src={coach.coverImageUrl}
+                  alt={`Couverture de ${coach.displayName}`}
+                  fill
+                  className="object-cover object-center sm:object-center"
+                  sizes="100vw"
+                  priority
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.24)_60%,rgba(255,255,255,0.7)_100%)] sm:bg-[linear-gradient(90deg,rgba(255,255,255,0.24),rgba(255,255,255,0.1)_42%,rgba(255,255,255,0.34)_100%)]" />
+              </>
+            ) : (
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(207,253,90,0.18),transparent_0_28%),linear-gradient(180deg,#fafaf6_0%,#ecebe4_100%)]" />
+            )}
 
-              <div className="mt-5 grid gap-2.5 sm:grid-cols-4">
-                {stats.map((stat) => (
-                  <div key={stat.label} className="flex items-center gap-3 rounded-[14px] border border-black/8 bg-white px-3.5 py-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f4f4ef] text-[#101010]">
-                      {statIcons[stat.label]}
+            <div className="absolute inset-y-0 left-[38%] hidden w-10 -skew-x-[16deg] bg-[var(--accent)]/72 sm:block md:w-12" />
+            <div className="absolute inset-y-0 left-[50%] hidden w-10 -skew-x-[16deg] bg-[var(--accent)]/72 sm:block md:w-12" />
+            <div className="absolute inset-y-0 left-[62%] hidden w-10 -skew-x-[16deg] bg-[var(--accent)]/72 sm:block md:w-12" />
+            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
+          </div>
+
+          <div className="relative px-4 pb-5 pt-0 sm:px-6 md:pb-6">
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                <div className="relative -mt-12 h-24 w-24 overflow-hidden rounded-full border-[3px] border-white bg-white shadow-[0_16px_30px_rgba(0,0,0,0.14)] sm:-mt-14 sm:h-24 sm:w-24 md:-mt-16 md:h-28 md:w-28">
+                  {coach.photoUrl ? (
+                    <Image
+                      src={coach.photoUrl}
+                      alt={coach.displayName}
+                      fill
+                      className="object-cover"
+                      sizes="(min-width: 768px) 112px, 96px"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-[#f4f4ef] text-4xl font-black text-black/24 md:text-5xl">
+                      {coach.displayName.slice(0, 1)}
                     </div>
-                    <div>
-                      <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-black/42">{stat.label}</div>
-                      <div className="mt-1 text-sm font-black text-[#101010]">{stat.value}</div>
-                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <div className="accent-text-shadow inline-flex items-center gap-2 rounded-full border border-black/10 bg-[#f7f7f2] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#6b7f20]">
+                    <span className="h-2 w-2 rounded-full bg-[var(--accent)]" />
+                    Coach certifié
                   </div>
+                  <h1 className="mt-3 max-w-[12ch] text-[1.8rem] font-black uppercase leading-[0.92] tracking-[-0.04em] text-[#101010] sm:max-w-none sm:text-[2.3rem] md:text-[2.75rem]">
+                    {coach.displayName}
+                  </h1>
+                  <p className="mt-1 text-sm font-semibold text-black/58 md:text-[15px]">{coach.discipline}</p>
+                </div>
+              </div>
+
+              <div className="hidden md:flex md:flex-wrap md:justify-end md:gap-2.5">
+                {socialLinks.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href ?? "#"}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-black/8 bg-[#f7f7f2] px-3 py-2 text-[11px] font-semibold text-black/62 transition hover:border-black/15 hover:text-black"
+                  >
+                    <span className="text-black/55">{socialIcons[item.label]}</span>
+                    {item.label}
+                  </a>
                 ))}
               </div>
             </div>
 
-            <div className="relative min-h-[260px] overflow-hidden md:min-h-[300px]">
-              <div className="absolute inset-y-0 right-[30%] hidden w-13 -skew-x-[16deg] bg-[var(--accent)] md:block" />
-              <div className="absolute inset-y-0 right-[18%] hidden w-13 -skew-x-[16deg] bg-[var(--accent)] md:block" />
-              <div className="absolute inset-y-0 right-[6%] hidden w-13 -skew-x-[16deg] bg-[var(--accent)] md:block" />
-              {coach.photoUrl ? (
-                <Image
-                  src={coach.photoUrl}
-                  alt={coach.displayName}
-                  fill
-                  className="object-contain object-right-bottom"
-                  priority
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-end justify-center pb-8">
-                  <div className="flex h-44 w-44 items-center justify-center rounded-full border border-black/8 bg-black/4 text-6xl font-black text-black/24">
-                    {coach.displayName.slice(0, 1)}
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-black/64 sm:mt-4 sm:leading-7 md:text-[15px]">
+              {coachSummary}
+            </p>
+
+            <div className="mt-4 grid gap-2.5 sm:mt-5 sm:grid-cols-2 xl:grid-cols-4">
+              {stats.map((stat) => (
+                <div key={stat.label} className="flex items-center gap-3 rounded-[14px] border border-black/8 bg-[#fcfcf8] px-3.5 py-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f0efe8] text-[#101010]">
+                    {statIcons[stat.label]}
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-black/42">{stat.label}</div>
+                    <div className="mt-1 text-sm font-black text-[#101010]">{stat.value}</div>
                   </div>
                 </div>
-              )}
+              ))}
             </div>
+
+            {socialLinks.length > 0 ? (
+              <div className="mt-4 flex flex-wrap gap-2 md:hidden">
+                {socialLinks.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href ?? "#"}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-black/8 bg-[#f7f7f2] px-3 py-2 text-[10px] font-semibold text-black/62 transition hover:border-black/15 hover:text-black sm:text-[11px]"
+                  >
+                    <span className="text-black/55">{socialIcons[item.label]}</span>
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+            ) : null}
           </div>
         </section>
 

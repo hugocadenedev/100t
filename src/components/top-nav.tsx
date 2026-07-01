@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import headerLogo from "../../12-removebg-preview 1.png";
+
 import { getCurrentUser } from "@/lib/auth";
 import { fullName } from "@/lib/utils";
 import { LogoutButton } from "@/components/logout-button";
@@ -15,7 +17,7 @@ export async function TopNav() {
       <div className="flex items-center justify-between px-4 py-3 md:px-8">
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center">
-            <Image src="/logo100t.png" alt="100T" width={116} height={34} className="h-8 w-auto md:h-9" priority />
+            <Image src={headerLogo} alt="100T" priority className="h-5 w-auto md:h-6" />
           </Link>
           <nav className="hidden items-center gap-6 md:flex">
             <Link href="/coachs" className="text-xs font-bold uppercase tracking-widest text-slate-100 transition-colors hover:text-[var(--accent)]">
