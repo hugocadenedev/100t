@@ -75,7 +75,7 @@ export function SubscribeModal({
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[var(--accent)]">Paiement sécurisé</p>
               <h3 className="text-3xl font-black uppercase tracking-tight text-white">Confirmer l'abonnement</h3>
               <p className="max-w-md text-sm leading-7 text-white/62">
-                Tu vas débloquer immédiatement tous les programmes présents et futurs de {coachName}. Le paiement est traité de manière sécurisée via Stripe.
+                Tu vas activer ton abonnement 100T avec {coachName} comme coach de référence. Tu pourras ensuite sélectionner tes programmes selon les règles de ton offre. Le paiement est traité de manière sécurisée via Stripe.
               </p>
             </div>
             <div className="mt-6 rounded-[16px] border border-white/6 bg-[var(--surface-strong)] p-4 text-sm text-white/78">

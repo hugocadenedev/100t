@@ -77,6 +77,8 @@ type DashboardData = {
   subscriptions: Subscription[];
   recentPrograms: RecentView[];
   monthlySelections: MonthlySelection[];
+  activePlanLimit: number;
+  currentMonthSelectionCount: number;
 };
 
 /* ─────────────────── icon ─────────────────── */
@@ -109,7 +111,7 @@ const NAV: Array<{ id: TabId; label: string; icon: keyof typeof ICONS }> = [
 
 function DashboardPanel({ data }: { data: DashboardData }) {
   const activeCount = data.subscriptions.length;
-  const programCount = data.subscriptions.reduce((s, sub) => s + (sub.coach?.programs.length ?? 0), 0);
+  const programCount = new Set(data.monthlySelections.map((selection) => selection.program.id)).size;
   const recentCount = data.recentPrograms.length;
 
   return (
@@ -160,7 +162,7 @@ function CoachesPanel({ data }: { data: DashboardData }) {
       <div className="border-b border-white/6 pb-5">
         <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--accent)]">Abonnements</p>
         <h2 className="mt-1 text-2xl font-black uppercase tracking-tighter text-white">Mes coachs</h2>
-        <p className="mt-1.5 text-sm text-slate-400">Coachs auxquels tu es abonné et leurs programmes débloqués.</p>
+        <p className="mt-1.5 text-sm text-slate-400">Coachs actifs, catalogue disponible et accès rapides vers leur profil public.</p>
       </div>
 
       {data.subscriptions.length ? (
@@ -181,7 +183,7 @@ function CoachesPanel({ data }: { data: DashboardData }) {
                 </div>
               </div>
               <div className="mt-4 flex flex-wrap gap-3">
-                <Link href={`/coach/${sub.coach?.slug ?? ""}`} className="app-button-accent px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]">
+                <Link href={sub.coach?.slug ? `/coach/${sub.coach.slug}` : "/coachs"} className="app-button-accent px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]">
                   Voir les programmes
                 </Link>
                 {sub.pendingCoach ? (
@@ -249,8 +251,18 @@ function CoachesPanel({ data }: { data: DashboardData }) {
 }
 
 function ProgramsPanel({ data }: { data: DashboardData }) {
-  const allPrograms = data.subscriptions.flatMap((sub) =>
-    (sub.coach?.programs ?? []).map((p) => ({ ...p, coachName: sub.coach?.displayName ?? "", coachSlug: sub.coach?.slug ?? "" }))
+  const allPrograms = Array.from(
+    new Map(
+      data.monthlySelections.map((selection) => [
+        selection.program.id,
+        {
+          ...selection.program,
+          key: `${selection.year}-${selection.month}-${selection.program.id}`,
+          month: selection.month,
+          year: selection.year,
+        },
+      ]),
+    ).values(),
   );
 
   return (
@@ -264,38 +276,22 @@ function ProgramsPanel({ data }: { data: DashboardData }) {
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {allPrograms.map((program) => (
             <Link
-              key={program.id}
+              key={program.key}
               href={`/programmes/${program.id}`}
               className="group flex flex-col overflow-hidden rounded-[22px] border border-white/5 bg-white/[0.01] transition hover:border-white/15"
             >
               {/* Cover */}
               <div className="relative h-36 w-full overflow-hidden bg-white/4">
-                {program.coverImage ? (
-                  <img
-                    src={program.coverImage}
-                    alt={program.title}
-                    className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0d0d0d] to-[#181818]">
-                    <span className="font-mono text-2xl font-black uppercase text-white/10 tracking-widest">
-                      {program.title.slice(0, 2).toUpperCase()}
-                    </span>
-                  </div>
-                )}
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0d0d0d] to-[#181818]">
+                  <span className="font-mono text-2xl font-black uppercase text-white/10 tracking-widest">
+                    {program.title.slice(0, 2).toUpperCase()}
+                  </span>
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-[rgba(6,9,14,0.7)] to-transparent" />
                 <div className="absolute bottom-2 left-3 flex gap-1.5">
                   <span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-semibold text-white/80 backdrop-blur-md">
-                    {difficultyLabels[program.difficulty]}
+                    Programme sélectionné
                   </span>
-                  <span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-semibold text-white/80 backdrop-blur-md">
-                    {formatDuration(program.totalDurationMinutes)}
-                  </span>
-                  {program._count && program._count.workoutSessions > 0 && (
-                    <span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-semibold text-white/80 backdrop-blur-md">
-                      {program._count.workoutSessions} séance{program._count.workoutSessions > 1 ? "s" : ""}
-                    </span>
-                  )}
                 </div>
               </div>
               {/* Body */}
@@ -303,6 +299,9 @@ function ProgramsPanel({ data }: { data: DashboardData }) {
                 <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">{program.coachName}</div>
                 <h3 className="text-sm font-bold uppercase tracking-tight text-white">{program.title}</h3>
                 <p className="line-clamp-2 text-xs leading-5 text-white/50">{program.description}</p>
+                <div className="text-[11px] text-white/38">
+                  Sélectionné en {new Date(program.year, program.month - 1, 1).toLocaleDateString("fr-FR", { month: "long", year: "numeric" })}
+                </div>
                 <div className="mt-auto pt-2 text-[11px] font-semibold text-white/40 transition group-hover:text-[var(--accent)]">
                   Voir le programme →
                 </div>
@@ -312,7 +311,7 @@ function ProgramsPanel({ data }: { data: DashboardData }) {
         </div>
       ) : (
         <div className="rounded-[20px] border border-white/5 bg-white/[0.008] p-8 text-sm text-white/50">
-          Aucun programme disponible. Abonne-toi à un coach pour accéder à ses programmes.
+          Aucun programme encore sélectionné. Choisis un programme dans l'onglet sélection du mois pour le retrouver ici.
         </div>
       )}
     </main>
@@ -331,6 +330,8 @@ function SelectionPanel({ data, availablePrograms }: { data: DashboardData; avai
         <MonthlyProgramSelector
           availablePrograms={availablePrograms}
           monthlySelections={data.monthlySelections}
+          selectionLimit={data.activePlanLimit}
+          currentMonthSelectionCount={data.currentMonthSelectionCount}
         />
       ) : (
         <div className="rounded-[20px] border border-white/5 bg-white/[0.008] p-8 text-sm text-white/50">

@@ -52,6 +52,7 @@ const offers: Offer[] = [
     ],
     note: "Offre principale, accessible au plus grand nombre.",
     accent: true,
+    extra: "Soit 238,80 € sur l'année.",
   },
   {
     name: "Offre Premium",
@@ -102,25 +103,25 @@ export default async function OffresPage() {
   const isAuthenticated = Boolean(user);
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
-      <section className="overflow-hidden p-2 lg:p-4">
+      <section className="light-shell overflow-hidden p-5 md:p-8">
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.28em] text-[var(--accent)]">Formules 100T</p>
-            <h1 className="mt-4 max-w-4xl text-3xl font-black uppercase tracking-tighter text-white md:text-5xl">
+            <p className="font-mono text-xs uppercase tracking-[0.28em] text-[#6b7f20]">Formules 100T</p>
+            <h1 className="mt-4 max-w-4xl text-3xl font-black uppercase tracking-tighter text-[#101010] md:text-5xl">
               Trois offres claires pour cadrer l'accès à la plateforme.
             </h1>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/68 md:text-base">
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-black/64 md:text-base">
               Une formule simple pour démarrer, une version annuelle plus rentable, et une offre premium pour les utilisateurs qui veulent plus de volume, plus de liberté et plus de contenu.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-[18px] border border-white/5 bg-white/[0.01] p-4">
-              <div className="font-mono text-2xl font-black text-[var(--accent)]">3</div>
-              <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/45">Formules</div>
+            <div className="light-panel p-4">
+              <div className="font-mono text-2xl font-black text-[#101010]">3</div>
+              <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-black/42">Formules</div>
             </div>
-            <div className="rounded-[18px] border border-white/5 bg-white/[0.01] p-4">
-              <div className="font-mono text-2xl font-black text-[var(--accent)]">19,90 €</div>
-              <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/45">A partir de</div>
+            <div className="light-panel p-4">
+              <div className="font-mono text-2xl font-black text-[#101010]">19,90 €</div>
+              <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-black/42">À partir de</div>
             </div>
 
           </div>
@@ -131,33 +132,33 @@ export default async function OffresPage() {
         {offers.map((offer, index) => (
           <article
             key={offer.name}
-            className={`grid gap-5 overflow-hidden rounded-[24px] border ${offer.accent ? "border-[rgba(207,253,90,0.14)] bg-[rgba(207,253,90,0.03)]" : "border-white/5 bg-white/[0.008]"} p-5 lg:grid-cols-[150px_1fr] lg:items-center lg:p-6`}
+            className={`grid gap-5 overflow-hidden rounded-[24px] border p-5 lg:grid-cols-[150px_1fr] lg:items-center lg:p-6 ${offer.accent ? "light-shell" : "light-panel"}`}
           >
             <div className="flex justify-center lg:justify-start">
               <PhonePreview accent={offer.accent} index={index * 2} />
             </div>
             <div className="space-y-4">
               <div className="flex flex-wrap items-center gap-3">
-                <span className={`${offer.accent ? "app-chip-accent" : "app-chip"} px-3 py-1.5 text-xs font-black uppercase tracking-[0.12em]`}>
+                <span className={`${offer.accent ? "app-chip-accent" : "light-chip"} px-3 py-1.5 text-xs font-black uppercase tracking-[0.12em]`}>
                   {offer.name}
                 </span>
                 {offer.eyebrow ? (
-                  <span className="rounded-full bg-white/8 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white/72">
+                  <span className="rounded-full bg-black/8 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-black/72">
                     {offer.eyebrow}
                   </span>
                 ) : null}
               </div>
 
               <div className="text-black">
-                <p className="text-2xl font-black text-white md:text-3xl">
-                  {offer.price} <span className="text-white/92">{offer.cadence}</span>
-                  <span className="ml-2 text-base font-semibold text-white/64">{offer.commitment}</span>
+                <p className="text-2xl font-black text-[#101010] md:text-3xl">
+                  {offer.price} <span className="text-black/88">{offer.cadence}</span>
+                  <span className="ml-2 text-base font-semibold text-black/56">{offer.commitment}</span>
                 </p>
               </div>
 
               <div className="grid gap-2.5 md:grid-cols-2">
                 {offer.features.map((feature) => (
-                  <div key={feature} className="flex items-center gap-3 border-b border-white/6 px-1 py-2.5 text-sm text-white/78 md:border-0 md:px-0">
+                  <div key={feature} className="flex items-center gap-3 border-b border-black/8 px-1 py-2.5 text-sm text-black/78 md:border-0 md:px-0">
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[10px] font-black text-black">
                       +
                     </span>
@@ -168,13 +169,13 @@ export default async function OffresPage() {
 
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div className="space-y-2">
-                  <p className="text-xl font-black text-white">{offer.note}</p>
+                  <p className="text-xl font-black text-[#101010]">{offer.note}</p>
                   {offer.extra ? <p className="text-sm font-semibold text-[var(--accent)] md:text-base">{offer.extra}</p> : null}
                 </div>
                 <PlanCheckoutButton
                   plan={offer.planKey}
                   isAuthenticated={isAuthenticated}
-                  className={`${offer.accent ? "app-button-accent" : "app-button-ghost"} inline-flex items-center justify-center px-5 py-2.5 text-xs font-black uppercase tracking-[0.16em] transition hover:bg-white hover:text-black`}
+                  className={`${offer.accent ? "app-button-accent" : "app-button-ghost"} inline-flex items-center justify-center px-5 py-2.5 text-xs font-black uppercase tracking-[0.16em] transition ${offer.accent ? "hover:opacity-90" : "border-black/10 bg-black text-white hover:bg-black/90"}`}
                 >
                   Choisir cette formule
                 </PlanCheckoutButton>
@@ -185,30 +186,30 @@ export default async function OffresPage() {
       </section>
 
       <section className="grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
-        <div className="rounded-[24px] border border-white/5 bg-white/[0.008] p-5">
-          <p className="font-mono text-xs uppercase tracking-[0.24em] text-[var(--accent)]">Lecture rapide</p>
-          <h2 className="mt-3 text-2xl font-black uppercase tracking-tighter text-white">Quelle formule choisir ?</h2>
-          <p className="mt-3 text-sm text-white/64 md:text-base">
+        <div className="light-panel p-5">
+          <p className="font-mono text-xs uppercase tracking-[0.24em] text-[#6b7f20]">Lecture rapide</p>
+          <h2 className="mt-3 text-2xl font-black uppercase tracking-tighter text-[#101010]">Quelle formule choisir ?</h2>
+          <p className="mt-3 text-sm text-black/64 md:text-base">
             L'Essentielle reste l'entrée la plus simple. L'annuelle baisse le prix mensuel. La Premium ouvre plus de volume pour les profils qui consomment plusieurs programmes chaque mois.
           </p>
         </div>
 
-        <div className="overflow-hidden rounded-[24px] border border-white/5 bg-white/[0.008] p-2">
-          <div className="grid gap-px overflow-hidden rounded-[20px] bg-white/6 md:grid-cols-3">
-            <div className="bg-black/45 p-5">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/45">Essentielle</p>
-              <p className="mt-3 text-xl font-black text-white">29,90 €</p>
-              <p className="mt-2 text-sm text-white/62">Souple, sans engagement.</p>
+        <div className="light-panel overflow-hidden p-2">
+          <div className="grid gap-px overflow-hidden rounded-[20px] bg-black/6 md:grid-cols-3">
+            <div className="bg-white p-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/42">Essentielle</p>
+              <p className="mt-3 text-xl font-black text-[#101010]">29,90 €</p>
+              <p className="mt-2 text-sm text-black/60">Souple, sans engagement.</p>
             </div>
-            <div className="bg-[rgba(207,253,90,0.12)] p-5">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--accent)]">Annuelle</p>
-              <p className="mt-3 text-xl font-black text-white">19,90 €</p>
-              <p className="mt-2 text-sm text-white/70">Mensuel · engagement 12 mois.</p>
+            <div className="bg-[rgba(207,253,90,0.22)] p-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#5f7318]">Annuelle</p>
+              <p className="mt-3 text-xl font-black text-[#101010]">19,90 €</p>
+              <p className="mt-2 text-sm text-black/70">Mensuel · engagement 12 mois.</p>
             </div>
-            <div className="bg-black/45 p-5">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/45">Premium</p>
-              <p className="mt-3 text-xl font-black text-white">49,90 €</p>
-              <p className="mt-2 text-sm text-white/62">Volume et liberté maximum.</p>
+            <div className="bg-white p-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/42">Premium</p>
+              <p className="mt-3 text-xl font-black text-[#101010]">49,90 €</p>
+              <p className="mt-2 text-sm text-black/60">Volume et liberté maximum.</p>
             </div>
           </div>
         </div>

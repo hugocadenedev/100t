@@ -11,22 +11,37 @@ const faqItems = [
   {
     question: "Comment fonctionne l'abonnement sur 100T ?",
     answer:
-      "Tu t'abonnes à un coach précis. Une fois l'abonnement actif, tu débloques sa page complète, ses programmes publiés et les prochaines mises à jour qu'il met en ligne.",
+      "Tu choisis une formule 100T, puis tu sélectionnes ton coach et ton programme selon les limites prévues par ton abonnement. Chaque mois, tu retrouves tes sélections dans ton tableau de bord et tu peux avancer à ton rythme.",
   },
   {
     question: "Est-ce que je peux comparer plusieurs coachs avant de choisir ?",
     answer:
-      "Oui. La page coachs te permet de filtrer par discipline, spécialités et budget, puis d'ouvrir chaque profil public pour comparer l'approche, l'expérience et les contenus proposés.",
+      "Oui. La page coachs te permet de filtrer par discipline et spécialités, puis d'ouvrir chaque profil public pour comparer l'approche, l'expérience et les contenus proposés.",
   },
   {
     question: "Les coachs sont-ils validés avant d'apparaître sur la plateforme ?",
     answer:
-      "Oui. Chaque coach remplit une candidature détaillée et son profil n'apparaît publiquement qu'après validation par l'administration.",
+      "Oui. Chaque coach remplit une candidature détaillée, présente ses diplômes et son expérience, et son profil n'apparaît publiquement qu'après validation par l'administration.",
   },
   {
-    question: "Quel type de sports puis-je trouver sur 100T ?",
+    question: "Je me suis trompé de coach ou de programme, puis-je annuler ?",
     answer:
-      "La plateforme couvre plusieurs univers: musculation, cross-training, running, yoga, mobilité et d'autres disciplines à mesure que de nouveaux coachs sont approuvés.",
+      "Avant la validation finale, un message de confirmation t'aide à vérifier ton choix. Une fois la sélection validée pour le mois en cours, elle est comptabilisée selon les règles de ton offre.",
+  },
+  {
+    question: "Puis-je sélectionner plusieurs programmes dans le même mois ?",
+    answer:
+      "Oui, si ta formule le permet. L'offre Essentielle donne accès à 1 programme par mois, tandis que la Premium permet jusqu'à 3 sélections mensuelles.",
+  },
+  {
+    question: "Puis-je annuler mon abonnement à tout moment ?",
+    answer:
+      "Oui. Les offres sans engagement peuvent être résiliées en fin de période. Si une formule comporte une durée minimale, cette information est affichée clairement avant paiement.",
+  },
+  {
+    question: "Le suivi est-il personnalisé ?",
+    answer:
+      "Tu choisis un coach expert, un programme adapté à ton objectif et tu peux échanger dans le cadre prévu par la plateforme. 100T propose un accompagnement structuré, sans promettre du coaching privé illimité.",
   },
 ] as const;
 
@@ -51,10 +66,10 @@ export default async function Home() {
               tout compris.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-white/68 md:text-lg">
-              Les meilleurs coachs accessibles en un clic.
+              Un coaching de qualité, sans engagement. Sélectionnez votre coach, téléchargez votre programme et progressez à votre rythme grâce à des contenus conçus par des professionnels certifiés.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
-              {["Simple", "Flexible", "Sans engagement"].map((tag) => (
+              {["SIMPLE", "FLEXIBLE", "SANS ENGAGEMENT"].map((tag) => (
                 <span key={tag} className="rounded-full border border-white/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-white/45">
                   {tag}
                 </span>
@@ -74,7 +89,7 @@ export default async function Home() {
             <article className="app-panel-soft rounded-[28px] p-5 sm:col-span-2">
               <div className="text-[10px] uppercase tracking-[0.18em] text-white/38">Positionnement</div>
               <p className="mt-3 max-w-md text-sm leading-6 text-white/70">
-                Un catalogue premium de coachs indépendants avec page publique, abonnement individuel et contenus débloqués proprement.
+                Un coaching de qualité, sans engagement. Une plateforme claire pour choisir un coach, sélectionner le bon programme et progresser sans friction.
               </p>
             </article>
             <article className="app-panel-soft rounded-[28px] p-5">
@@ -210,10 +225,10 @@ export default async function Home() {
               </h2>
             </div>
             <Link
-              href="/connexion"
+              href="#support"
               className="inline-flex items-center justify-center rounded-full bg-[#242424] px-6 py-3 text-sm font-medium text-white transition hover:bg-black"
             >
-              Me contacter
+              Nous contacter
             </Link>
           </div>
 
@@ -274,7 +289,7 @@ export default async function Home() {
               </li>
             </ul>
           </div>
-          <div>
+          <div id="support">
             <h4 className="mb-6 text-sm font-semibold uppercase tracking-widest text-white">Support</h4>
             <ul className="space-y-4 text-xs font-semibold uppercase text-slate-400">
               <li>

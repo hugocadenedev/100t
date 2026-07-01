@@ -38,13 +38,36 @@ const socialIcons: Record<string, React.ReactNode> = {
   ),
 };
 
+const statIcons: Record<string, React.ReactNode> = {
+  "Abonnés": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M9.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM20 8v6M23 11h-6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  "Expérience": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4">
+      <path d="M12 8v4l2.5 2.5M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  "Clients coachés": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4">
+      <path d="M15 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M18 8a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM8.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm10 10v-2a4 4 0 0 0-3-3.87" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  "Programmes": (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5V5A2.5 2.5 0 0 1 6.5 2.5H20v19H6.5A2.5 2.5 0 0 1 4 19.5Z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+};
+
 export default async function CoachPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const data = await getCoachPageData(slug);
 
   if (!data.coach) notFound();
 
-  const { coach, isSubscribed, hasActivePlatformSub, selectedProgramIds, selectionLimitReached, hasActiveSubElsewhere, switchPendingToThisCoach, user } = data;
+  const { coach, isSubscribed, hasActivePlatformSub, selectedProgramIds, planLimit, selectionLimitReached, hasActiveSubElsewhere, switchPendingToThisCoach, user } = data;
 
   const socialLinks = [
     { label: "Instagram", href: coach.instagramUrl },
@@ -65,124 +88,89 @@ export default async function CoachPage({ params }: { params: Promise<{ slug: st
     { label: "Programmes", value: coach.programs.length },
   ];
 
+  const coachSummary = coach.bio.split(/(?<=[.!?])\s+/).filter(Boolean)[0] ?? coach.bio;
+
   return (
-    <div className="min-h-screen">
-      {/* HERO — couverture */}
-      <div className="relative h-52 w-full overflow-hidden md:h-64 lg:h-72">
-        {coach.coverImageUrl ? (
-          <Image
-            src={coach.coverImageUrl}
-            alt="Couverture"
-            fill
-            className="object-cover object-center"
-            priority
-          />
-        ) : (
-          <div className="relative h-full w-full bg-gradient-to-br from-[#0c1015] via-[#111820] to-[#0a0d10]">
-            <div
-              className="absolute inset-0"
-              style={{ background: "radial-gradient(ellipse 60% 70% at 30% 50%, rgba(180,255,80,0.06) 0%, transparent 70%)" }}
-            />
-            <div className="absolute inset-0 flex items-center justify-start px-12 opacity-[0.03]">
-              <span className="font-mono text-[16rem] font-black uppercase leading-none text-white">
-                {coach.displayName.slice(0, 1)}
-              </span>
-            </div>
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-[rgba(6,9,14,0.15)] to-transparent" />
-
-        {/* Retour */}
-        <div className="absolute left-4 top-4 sm:left-6 lg:left-8">
-          <Link
-            href="/coachs"
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-black/50 px-3 py-1.5 text-xs font-semibold text-white/70 backdrop-blur-sm transition hover:border-white/25 hover:text-white"
-          >
-            ← Tous les coachs
-          </Link>
-        </div>
-
-        {/* Discipline */}
-        <div className="absolute right-4 top-4 sm:right-6 lg:right-8">
-          <span className="rounded-full border border-[var(--accent)]/30 bg-black/60 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--accent)] backdrop-blur-sm">
-            {coach.discipline}
-          </span>
-        </div>
-      </div>
-
-      {/* IDENTITÉ — avatar + nom */}
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        {/* Avatar — chevauchement sur la couverture */}
-        <div className="-mt-14 mb-3 md:-mt-16">
-          <div className="relative h-24 w-24 overflow-hidden rounded-full border-4 border-[var(--bg)] shadow-xl md:h-28 md:w-28">
-            {coach.photoUrl ? (
-              <Image
-                src={coach.photoUrl}
-                alt={coach.displayName}
-                fill
-                className="object-cover object-top"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-white/8 to-white/[0.02]">
-                <span className="text-2xl font-black uppercase text-white/40">
-                  {coach.displayName.slice(0, 1)}
-                </span>
+    <div className="min-h-screen bg-[#f8f7f2] text-[#101010]">
+      <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+        <section className="border-b border-black/8 pb-6 pt-2">
+          <div className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
+            <div>
+              <div className="accent-text-shadow inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/75 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#6b7f20]">
+                <span className="h-2 w-2 rounded-full bg-[var(--accent)]" />
+                Coach certifié
               </div>
-            )}
-          </div>
-        </div>
-        {/* Nom + accroche — toujours sous l'avatar */}
-        <div className="pb-5">
-          <h1 className="text-2xl font-black uppercase leading-tight tracking-tighter text-white md:text-3xl lg:text-[2.2rem]">
-            {coach.displayName}
-          </h1>
-          <p className="mt-1.5 text-sm font-medium text-white/50">{coach.headline}</p>
-        </div>
-      </div>
+              <h1 className="mt-4 text-[2.35rem] font-black uppercase leading-[0.92] tracking-[-0.04em] text-[#101010] md:text-[3rem] lg:text-[3.35rem]">
+                {coach.displayName}
+              </h1>
+              <p className="accent-text-shadow mt-1.5 text-sm font-semibold text-[var(--accent)] md:text-base">{coach.discipline}</p>
+              <p className="mt-3 max-w-xl text-sm leading-7 text-black/64 md:text-[15px]">
+                {coachSummary}
+              </p>
 
-      {/* STATS BAR */}
-      <div className="border-y border-white/5 bg-white/[0.025]">
-        <div className="mx-auto flex max-w-5xl overflow-x-auto px-4 sm:px-6 lg:px-8">
-          {stats.map((stat, i) => (
-            <div
-              key={stat.label}
-              className={`flex shrink-0 flex-col gap-0.5 px-5 py-4 ${i > 0 ? "border-l border-white/5" : ""}`}
-            >
-              <span className="whitespace-nowrap text-[10px] font-medium uppercase tracking-[0.22em] text-white/30">
-                {stat.label}
-              </span>
-              <span className="whitespace-nowrap text-sm font-bold text-white">{stat.value}</span>
+              <div className="mt-5 grid gap-2.5 sm:grid-cols-4">
+                {stats.map((stat) => (
+                  <div key={stat.label} className="flex items-center gap-3 rounded-[14px] border border-black/8 bg-white px-3.5 py-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f4f4ef] text-[#101010]">
+                      {statIcons[stat.label]}
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-black/42">{stat.label}</div>
+                      <div className="mt-1 text-sm font-black text-[#101010]">{stat.value}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* CONTENU */}
-      <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[1fr_280px] lg:px-8">
+            <div className="relative min-h-[260px] overflow-hidden md:min-h-[300px]">
+              <div className="absolute inset-y-0 right-[30%] hidden w-13 -skew-x-[16deg] bg-[var(--accent)] md:block" />
+              <div className="absolute inset-y-0 right-[18%] hidden w-13 -skew-x-[16deg] bg-[var(--accent)] md:block" />
+              <div className="absolute inset-y-0 right-[6%] hidden w-13 -skew-x-[16deg] bg-[var(--accent)] md:block" />
+              {coach.photoUrl ? (
+                <Image
+                  src={coach.photoUrl}
+                  alt={coach.displayName}
+                  fill
+                  className="object-contain object-right-bottom"
+                  priority
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-end justify-center pb-8">
+                  <div className="flex h-44 w-44 items-center justify-center rounded-full border border-black/8 bg-black/4 text-6xl font-black text-black/24">
+                    {coach.displayName.slice(0, 1)}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+  <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_272px]">
 
         {/* Colonne gauche */}
         <div className="space-y-6">
           {/* Programmes */}
-          <div className="space-y-4">
-            <SectionLabel>
+          <div className="space-y-3.5">
+            <SectionLabel className="mb-0 text-black/78">
               Programmes
               {isSubscribed ? (
-                <span className="ml-2 font-mono text-white/25">
-                  ({coach.programs.length} débloqué{coach.programs.length > 1 ? "s" : ""})
+                <span className="ml-2 font-mono text-black/30">
+                  ({coach.programs.length} disponibles)
                 </span>
               ) : (
-                <span className="ml-2 font-mono text-white/25">({coach.programs.length})</span>
+                <span className="ml-2 font-mono text-black/30">({coach.programs.length})</span>
               )}
             </SectionLabel>
 
             {coach.programs.length ? (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-3">
                 {coach.programs.map((program: (typeof coach.programs)[number]) => (
                   <article
                     key={program.id}
-                    className="group flex flex-col overflow-hidden rounded-[22px] border border-white/5 bg-white/[0.02] transition hover:border-white/10"
+                    className="group flex flex-col overflow-hidden rounded-[16px] border border-black/8 bg-[linear-gradient(180deg,#1a1a1a_0%,#0c0c0c_100%)] shadow-[0_10px_24px_rgba(0,0,0,0.12)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(0,0,0,0.18)]"
                   >
-                    <div className="relative h-40 overflow-hidden bg-white/[0.03]">
+                    <div className="relative h-44 overflow-hidden bg-white/[0.03]">
                       {program.coverImage ? (
                         <Image
                           src={program.coverImage}
@@ -197,7 +185,7 @@ export default async function CoachPage({ params }: { params: Promise<{ slug: st
                           </span>
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[rgba(6,9,14,0.75)] to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[rgba(6,9,14,0.88)] via-[rgba(6,9,14,0.18)] to-transparent" />
                       <div className="absolute bottom-2.5 left-3 flex flex-wrap gap-1.5">
                         {program.submissionMeta ? (
                           <>
@@ -229,10 +217,10 @@ export default async function CoachPage({ params }: { params: Promise<{ slug: st
                       </div>
                     </div>
 
-                    <div className="flex flex-1 flex-col gap-3 p-4">
+                    <div className="flex flex-1 flex-col gap-3 p-3.5">
                       <div>
-                        <h3 className="text-sm font-bold uppercase tracking-tight text-white">{program.title}</h3>
-                        <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-white/45">{program.description}</p>
+                        <h3 className="text-[1.05rem] font-black uppercase tracking-tight text-white">{program.title}</h3>
+                        <p className="mt-1.5 line-clamp-2 text-[13px] leading-5 text-white/68">{program.description}</p>
                       </div>
                       <div className="mt-auto pt-1">
                         {isSubscribed ? (
@@ -256,7 +244,7 @@ export default async function CoachPage({ params }: { params: Promise<{ slug: st
                             // Limit reached
                             <Link
                               href={`/programmes/${program.id}`}
-                              className="inline-flex w-full items-center justify-center rounded-[12px] border border-white/8 px-4 py-2.5 text-xs font-semibold text-white/40 transition hover:border-white/20 hover:text-white/70"
+                              className="inline-flex w-full items-center justify-center rounded-full border border-white/14 bg-white/[0.03] px-4 py-2.5 text-xs font-semibold text-white/82 transition hover:border-white/28 hover:bg-white/[0.06]"
                             >
                               Voir le programme →
                             </Link>
@@ -264,13 +252,16 @@ export default async function CoachPage({ params }: { params: Promise<{ slug: st
                             // Has active sub, can select
                             <SelectProgramButton
                               programId={program.id}
+                              confirmMessage={planLimit === 1
+                                ? `Es-tu sûr de vouloir sélectionner \"${program.title}\" ? Une fois ce choix validé, tu ne pourras pas sélectionner d'autre programme avant le mois prochain.`
+                                : `Es-tu sûr de vouloir sélectionner \"${program.title}\" ? Après validation, il te restera ${Math.max(planLimit - (selectedProgramIds.size + 1), 0)} sélection${planLimit - (selectedProgramIds.size + 1) > 1 ? "s" : ""} pour ce mois.`}
                               className="app-button-accent inline-flex w-full items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-[0.14em]"
                             />
                           )
                         ) : user?.role !== "COACH" ? (
                           <Link
                             href={`/programmes/${program.id}`}
-                            className="inline-flex w-full items-center justify-center rounded-[12px] border border-white/8 px-4 py-2.5 text-xs font-semibold text-white/40 transition hover:border-white/20 hover:text-white/70"
+                            className="inline-flex w-full items-center justify-center rounded-full border border-white/14 bg-white/[0.03] px-4 py-2.5 text-xs font-semibold text-white/82 transition hover:border-white/28 hover:bg-white/[0.06]"
                           >
                             Voir le programme →
                           </Link>
@@ -281,7 +272,7 @@ export default async function CoachPage({ params }: { params: Promise<{ slug: st
                 ))}
               </div>
             ) : (
-              <div className="rounded-[22px] border border-white/5 bg-white/[0.02] p-8 text-center text-sm text-white/35">
+              <div className="light-panel p-8 text-center text-sm text-black/45">
                 Aucun programme publié pour le moment.
               </div>
             )}
@@ -292,54 +283,73 @@ export default async function CoachPage({ params }: { params: Promise<{ slug: st
         <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
 
           {/* Bio avec voir plus */}
-          <details className="group rounded-[22px] border border-white/5 bg-white/[0.02] p-5">
+          <details className="group rounded-[16px] border border-black/8 bg-white p-4 shadow-[0_8px_18px_rgba(0,0,0,0.035)]">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-              <SectionLabel>À propos</SectionLabel>
-              <span className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--accent)] group-open:hidden">Voir plus ↓</span>
-              <span className="hidden text-[10px] font-black uppercase tracking-[0.18em] text-white/40 group-open:inline">Réduire ↑</span>
+              <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#101010]">
+                <span className="text-black">
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5"><path d="M8 5v14l11-7z" /></svg>
+                </span>
+                À propos du coach
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-[0.18em] text-black/44 group-open:hidden">Voir plus →</span>
+              <span className="hidden text-[10px] font-black uppercase tracking-[0.18em] text-black/40 group-open:inline">Réduire ↑</span>
             </summary>
             {/* Extrait visible quand fermé */}
-            <p className="mt-3 line-clamp-3 text-sm leading-[1.9] text-white/65 group-open:hidden">{coach.bio}</p>
+            <p className="mt-3 line-clamp-3 text-sm leading-[1.9] text-black/68 group-open:hidden">{coach.bio}</p>
             {/* Texte complet quand ouvert */}
-            <p className="mt-3 hidden whitespace-pre-line text-sm leading-[1.9] text-white/65 group-open:block">{coach.bio}</p>
+            <p className="mt-3 hidden whitespace-pre-line text-sm leading-[1.9] text-black/68 group-open:block">{coach.bio}</p>
           </details>
 
           {isSubscribed ? (
-            <div className="rounded-[22px] border border-emerald-400/20 bg-emerald-400/[0.07] p-5">
-              <div className="flex items-center gap-2.5">
-                <div className="h-2 w-2 rounded-full bg-emerald-400" />
-                <span className="text-sm font-bold text-emerald-100">Accès actif</span>
+            <div className="rounded-[16px] border border-black/8 bg-white p-4 shadow-[0_8px_18px_rgba(0,0,0,0.035)]">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2 text-sm font-bold text-[#101010]">
+                    <span className="h-2 w-2 rounded-full bg-[var(--accent)]" />
+                    Abonnement actif
+                  </div>
+                  <p className="text-sm text-black/62">Sélectionne un programme ci-dessus pour ce mois.</p>
+                </div>
+                <div className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-[var(--accent)]/24 text-black">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
+                    <path d="M8 7V5a4 4 0 1 1 8 0v2M6 7h12v12H6z" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
               </div>
-              <p className="mt-2 text-xs leading-5 text-emerald-100/55">
-                Tous les programmes de ce coach sont débloqués.
-              </p>
             </div>
           ) : hasActivePlatformSub ? (
-            <div className="rounded-[22px] border border-emerald-400/20 bg-emerald-400/[0.07] p-5">
-              <div className="flex items-center gap-2.5">
-                <div className="h-2 w-2 rounded-full bg-emerald-400" />
-                <span className="text-sm font-bold text-emerald-100">Abonnement actif</span>
+            <div className="rounded-[16px] border border-black/8 bg-white p-4 shadow-[0_8px_18px_rgba(0,0,0,0.035)]">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2 text-sm font-bold text-[#101010]">
+                    <span className="h-2 w-2 rounded-full bg-[var(--accent)]" />
+                    Abonnement actif
+                  </div>
+                  <p className="text-sm text-black/62">Sélectionne un programme ci-dessus pour ce mois.</p>
+                </div>
+                <div className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-[var(--accent)]/24 text-black">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
+                    <path d="M8 7V5a4 4 0 1 1 8 0v2M6 7h12v12H6z" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
               </div>
-              <p className="mt-2 text-xs leading-5 text-emerald-100/55">
-                Sélectionne un programme ci-dessus pour ce mois.
-              </p>
             </div>
           ) : switchPendingToThisCoach ? (
-            <div className="rounded-[22px] border border-[var(--accent)]/20 bg-[var(--accent)]/[0.06] p-5">
+            <div className="rounded-[16px] border border-black/8 bg-white p-4 shadow-[0_8px_18px_rgba(0,0,0,0.035)]">
               <div className="flex items-center gap-2.5">
                 <div className="h-2 w-2 animate-pulse rounded-full bg-[var(--accent)]" />
-                <span className="text-sm font-bold text-[var(--accent)]">Changement programmé</span>
+                <span className="text-sm font-bold text-[#101010]">Changement programmé</span>
               </div>
-              <p className="mt-2 text-xs leading-5 text-white/40">Actif dès le prochain renouvellement.</p>
+              <p className="mt-2 text-xs leading-5 text-black/52">Actif dès le prochain renouvellement.</p>
             </div>
           ) : user?.role !== "COACH" ? (
-            <div className="rounded-[22px] border border-white/5 bg-white/[0.02] p-5">
-              <SectionLabel>Accès complet</SectionLabel>
+            <div className="rounded-[16px] border border-black/8 bg-white p-4 shadow-[0_8px_18px_rgba(0,0,0,0.035)]">
+              <SectionLabel className="text-black/66">Accès complet</SectionLabel>
               <div className="mb-3">
-                <span className="text-2xl font-black text-white">À partir de {formatPrice(19.9)}</span>
-                <span className="ml-1.5 text-sm text-white/35">/ mois</span>
+                <span className="text-2xl font-black text-[#101010]">À partir de {formatPrice(19.9)}</span>
+                <span className="ml-1.5 text-sm text-black/35">/ mois</span>
               </div>
-              <p className="mb-4 text-xs leading-5 text-white/40">
+              <p className="mb-4 text-xs leading-5 text-black/54">
                 Choisis une formule et sélectionne un programme par mois. Annulable à tout moment.
               </p>
               <Link
@@ -352,13 +362,13 @@ export default async function CoachPage({ params }: { params: Promise<{ slug: st
           ) : null}
 
           {specialities.length > 0 && (
-            <div className="rounded-[22px] border border-white/5 bg-white/[0.02] p-5">
-              <SectionLabel>Spécialisations</SectionLabel>
+            <div className="rounded-[16px] border border-black/8 bg-white p-4 shadow-[0_8px_18px_rgba(0,0,0,0.035)]">
+              <SectionLabel className="text-black/66">Spécialisations</SectionLabel>
               <div className="flex flex-wrap gap-2">
                 {specialities.map((s: string) => (
                   <span
                     key={s}
-                    className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-1 text-xs font-medium text-white/55"
+                    className="rounded-full border border-black/10 bg-[#f6f5f1] px-3 py-1 text-xs font-medium text-black/56"
                   >
                     {s}
                   </span>
@@ -368,8 +378,8 @@ export default async function CoachPage({ params }: { params: Promise<{ slug: st
           )}
 
           {socialLinks.length > 0 && (
-            <div className="rounded-[22px] border border-white/5 bg-white/[0.02] p-5">
-              <SectionLabel>Réseaux &amp; liens</SectionLabel>
+            <div className="rounded-[18px] border border-black/8 bg-white p-5 shadow-[0_10px_24px_rgba(0,0,0,0.04)]">
+              <SectionLabel className="text-black/66">Réseaux &amp; liens</SectionLabel>
               <div className="space-y-1">
                 {socialLinks.map((link) => (
                   <a
@@ -377,11 +387,11 @@ export default async function CoachPage({ params }: { params: Promise<{ slug: st
                     href={link.href!}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-3 rounded-[12px] px-3 py-2.5 text-sm font-medium text-white/55 transition hover:bg-white/[0.04] hover:text-[var(--accent)]"
+                    className="flex items-center gap-3 rounded-[12px] px-3 py-2.5 text-sm font-medium text-black/58 transition hover:bg-black/[0.03] hover:text-[#101010]"
                   >
-                    <span className="text-white/25">{socialIcons[link.label]}</span>
+                    <span className="text-black/28">{socialIcons[link.label]}</span>
                     {link.label}
-                    <span className="ml-auto text-[10px] text-white/20">↗</span>
+                    <span className="ml-auto text-[10px] text-black/24">↗</span>
                   </a>
                 ))}
               </div>
@@ -390,15 +400,15 @@ export default async function CoachPage({ params }: { params: Promise<{ slug: st
         </div>
       </div>
 
-      {/* Sticky CTA bas de page */}
-      {!isSubscribed && !switchPendingToThisCoach && user?.role !== "COACH" && coach.programs.length > 0 && (
-        <div className="sticky bottom-4 z-30 flex justify-center px-4">
-          <div className="flex w-full max-w-2xl items-center justify-between gap-4 rounded-full border border-white/8 bg-[rgba(8,10,14,0.94)] px-5 py-3.5 shadow-[0_22px_60px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+        {/* Sticky CTA bas de page */}
+        {!isSubscribed && !switchPendingToThisCoach && user?.role !== "COACH" && coach.programs.length > 0 && (
+          <div className="sticky bottom-4 z-30 flex justify-center px-1">
+            <div className="flex w-full max-w-4xl items-center justify-between gap-4 rounded-[16px] border border-black/8 bg-white px-5 py-3 shadow-[0_14px_34px_rgba(0,0,0,0.08)] backdrop-blur-xl">
             <div>
-              <div className="text-sm font-bold text-white">
+              <div className="text-sm font-bold text-[#101010]">
                 Débloque {coach.programs.length} programme{coach.programs.length > 1 ? "s" : ""}
               </div>
-              <div className="text-xs text-white/35">
+              <div className="text-xs text-black/45">
                 {formatPrice(PLATFORM_MONTHLY_PRICE)} / mois · annulable à tout moment
               </div>
             </div>
@@ -414,16 +424,17 @@ export default async function CoachPage({ params }: { params: Promise<{ slug: st
                 redirectAfter={`/coach/${coach.slug}`}
               />
             )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function SectionLabel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.3em] text-[var(--accent)]">
+    <p className={`mb-4 font-mono text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] ${className}`}>
       {children}
     </p>
   );

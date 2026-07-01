@@ -115,7 +115,7 @@ export default async function AbonnementSuccesPage({
         </h1>
         <p className="text-sm leading-7 text-white/62">
           {activated
-            ? "Ton paiement a bien été confirmé. Tu as maintenant accès à tous les programmes de ton coach."
+            ? "Ton paiement a bien été confirmé. Tu peux maintenant choisir ton coach et sélectionner tes programmes depuis ton tableau de bord."
             : "Ton paiement est en cours de vérification. Actualise la page dans quelques secondes ou accède à ton tableau de bord."}
         </p>
         <Link

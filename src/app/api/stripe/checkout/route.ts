@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
           currency: "eur",
           product_data: {
             name: `Abonnement coaching — ${coachName}`,
-            description: "Accès illimité à tous les programmes de coaching présents et futurs.",
+            description: "Active ton accès 100T et sélectionne tes programmes mensuels avec ce coach de référence.",
           },
           unit_amount: coach.monthlyPrice * 100, // centimes
           recurring: { interval: "month" },

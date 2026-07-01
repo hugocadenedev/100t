@@ -1,5 +1,6 @@
 import "server-only";
 
+import { PLAN_MONTHLY_LIMIT } from "@/lib/domain";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { fullName, getUnlockedMonths } from "@/lib/utils";
@@ -309,20 +310,18 @@ export async function getProgramPageData(programId: string) {
       })
     : null;
 
-  // Check monthly selection (new plan-based model)
-  const now = new Date();
-  const currentMonth = now.getMonth() + 1;
-  const currentYear = now.getFullYear();
+  // Check whether the user has ever selected this program.
+  // Selected programs remain visible in the library after the month of selection.
   const monthlySelection = user
-    ? await prisma.monthlyProgramSelection.findUnique({
+    ? await prisma.monthlyProgramSelection.findFirst({
         where: {
-          userId_programId_month_year: {
-            userId: user.id,
-            programId,
-            month: currentMonth,
-            year: currentYear,
-          },
+          userId: user.id,
+          programId,
         },
+        orderBy: [
+          { year: "desc" },
+          { month: "desc" },
+        ],
       })
     : null;
 
@@ -430,7 +429,11 @@ export async function getProgramPageData(programId: string) {
 }
 
 export async function getUserDashboardData(userId: string) {
-  const [subscriptions, recentPrograms, monthlySelections] = await Promise.all([
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1;
+  const currentYear = now.getFullYear();
+
+  const [subscriptions, recentPrograms, monthlySelections, currentMonthSelectionCount] = await Promise.all([
     prisma.subscription.findMany({
       where: {
         subscriberId: userId,
@@ -489,7 +492,13 @@ export async function getUserDashboardData(userId: string) {
         },
       },
     }),
+    prisma.monthlyProgramSelection.count({
+      where: { userId, month: currentMonth, year: currentYear },
+    }),
   ]);
+
+  const activeSubscription = subscriptions.find((subscription) => subscription.currentPeriodEnd > new Date());
+  const activePlanLimit = PLAN_MONTHLY_LIMIT[activeSubscription?.plan ?? "ESSENTIELLE"] ?? 1;
 
   return {
     subscriptions: subscriptions.map((subscription: (typeof subscriptions)[number]) => ({
@@ -523,6 +532,8 @@ export async function getUserDashboardData(userId: string) {
         coachSlug: sel.program.coach.slug,
       },
     })),
+    activePlanLimit,
+    currentMonthSelectionCount,
   };
 }
 
