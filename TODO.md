@@ -45,7 +45,7 @@
 ## 🟢 Améliorations & Finitions
 
 ### UX
-- [ ] **Email de confirmation** après souscription réussie (via `resend` ou `nodemailer` + template HTML)
+- [ OK] **Email de confirmation** après souscription réussie (via `resend` ou `nodemailer` + template HTML)
 - [ ] **Email de rappel** avant renouvellement (j-3)
 - [ ] Page `/abonnement/succes` : afficher le récapitulatif de la commande (montant, coach, date de fin de période) via `stripe.checkout.sessions.retrieve`
 - [ ] Animation de transition sur la modale d'abonnement (entrée/sortie)

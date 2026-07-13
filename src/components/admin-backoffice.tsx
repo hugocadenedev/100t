@@ -7,8 +7,11 @@ import { AdminUploadProgramForm } from "@/components/admin-upload-program-form";
 import {
   adminAssignCoachCategoryAction,
   adminCreateCategoryAction,
+  adminDeleteCoachAction,
   adminDeleteCategoryAction,
+  adminDeleteProgramAction,
   adminDeleteSubscriptionAction,
+  adminDeleteUserAction,
   adminReviewCoachApplicationAction,
   adminReviewProgramSubmissionFormAction,
   adminToggleProgramPublishAction,
@@ -163,6 +166,69 @@ function SectionTitle({ eyebrow, title, subtitle }: { eyebrow?: string; title: s
   );
 }
 
+function AdminDangerConfirmForm({
+  action,
+  title,
+  description,
+  submitLabel = "Confirmer la suppression",
+}: {
+  action: (formData: FormData) => void | Promise<void>;
+  title: string;
+  description: string;
+  submitLabel?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [checked, setChecked] = useState(false);
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="rounded-full bg-rose-400/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-rose-100 transition hover:bg-rose-400/15"
+      >
+        Supprimer
+      </button>
+    );
+  }
+
+  return (
+    <form action={action} className="w-full rounded-[16px] border border-rose-400/20 bg-rose-400/[0.04] p-3 text-left lg:max-w-[260px]">
+      <p className="text-xs font-black uppercase tracking-[0.16em] text-rose-100">{title}</p>
+      <p className="mt-2 text-xs leading-5 text-slate-300">{description}</p>
+      <label className="mt-3 flex items-start gap-2 text-xs text-slate-300">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(event) => setChecked(event.target.checked)}
+          className="mt-0.5"
+        />
+        <span>Je confirme cette suppression définitive.</span>
+      </label>
+      <input type="hidden" name="confirmDeletion" value={checked ? "yes" : "no"} />
+      <div className="mt-3 flex gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            setOpen(false);
+            setChecked(false);
+          }}
+          className="rounded-full border border-white/10 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-300 transition hover:border-white/20 hover:text-white"
+        >
+          Annuler
+        </button>
+        <button
+          type="submit"
+          disabled={!checked}
+          className="rounded-full bg-rose-500/90 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-white transition hover:bg-rose-500 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {submitLabel}
+        </button>
+      </div>
+    </form>
+  );
+}
+
 /* ─────────────────────────── panels ─────────────────────────── */
 
 function DashboardPanel({ data }: { data: AdminData }) {
@@ -299,6 +365,13 @@ function UsersPanel({ data }: { data: AdminData }) {
                   OK
                 </button>
               </form>
+              <div className="mt-3 lg:mt-0 lg:justify-self-end">
+                <AdminDangerConfirmForm
+                  action={adminDeleteUserAction.bind(null, member.id)}
+                  title="Supprimer l'utilisateur"
+                  description={`Le compte ${member.displayName} et toutes ses données liées seront supprimés.`}
+                />
+              </div>
             </div>
           );
         })}
@@ -336,6 +409,13 @@ function CoachesPanel({ data }: { data: AdminData }) {
                 <div className="font-mono text-base font-black text-[var(--accent)]">{formatPrice(PLATFORM_MONTHLY_PRICE)}</div>
                 <div>Mensuel</div>
               </div>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <AdminDangerConfirmForm
+                action={adminDeleteCoachAction.bind(null, coach.id)}
+                title="Supprimer le coach"
+                description={`Le profil coach ${coach.displayName} sera supprimé, ainsi que ses programmes et dépôts.`}
+              />
             </div>
           </div>
         ))}
@@ -498,6 +578,11 @@ function ProgramsPanel({ data }: { data: AdminData }) {
                   PDF
                 </Link>
               )}
+              <AdminDangerConfirmForm
+                action={adminDeleteProgramAction.bind(null, program.id)}
+                title="Supprimer le programme"
+                description={`Le programme ${program.title} sera supprimé définitivement.`}
+              />
             </div>
           </div>
         ))}

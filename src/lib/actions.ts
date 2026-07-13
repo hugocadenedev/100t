@@ -1040,6 +1040,93 @@ export async function adminUpdateUserRoleAction(userId: string, formData: FormDa
   revalidatePath("/admin");
 }
 
+function ensureAdminDeletionConfirmed(formData: FormData) {
+  const confirmed = formData.get("confirmDeletion");
+
+  if (confirmed !== "yes") {
+    throw new Error("Confirmation de suppression manquante.");
+  }
+}
+
+export async function adminDeleteUserAction(userId: string, formData: FormData): Promise<void> {
+  const admin = await requireAdminUser();
+  ensureAdminDeletionConfirmed(formData);
+
+  if (admin.id === userId) {
+    throw new Error("Tu ne peux pas supprimer ton propre compte administrateur.");
+  }
+
+  const targetUser = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      coachProfile: true,
+      subscriptions: {
+        select: {
+          stripeSubscriptionId: true,
+        },
+      },
+    },
+  });
+
+  if (!targetUser) {
+    throw new Error("Utilisateur introuvable.");
+  }
+
+  if (targetUser.role === Role.ADMIN) {
+    const adminCount = await prisma.user.count({ where: { role: Role.ADMIN } });
+    if (adminCount <= 1) {
+      throw new Error("Impossible de supprimer le dernier administrateur.");
+    }
+  }
+
+  for (const subscription of targetUser.subscriptions) {
+    if (!subscription.stripeSubscriptionId) continue;
+
+    try {
+      await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
+    } catch {
+      // Ignore Stripe cancellation failures here so test accounts can still be purged locally.
+    }
+  }
+
+  await prisma.user.delete({ where: { id: userId } });
+
+  revalidatePath("/admin");
+  revalidatePath("/coachs");
+  revalidatePath("/tableau-de-bord");
+  if (targetUser.coachProfile?.slug) {
+    revalidatePath(`/coach/${targetUser.coachProfile.slug}`);
+  }
+}
+
+export async function adminDeleteCoachAction(coachId: string, formData: FormData): Promise<void> {
+  await requireAdminUser();
+  ensureAdminDeletionConfirmed(formData);
+
+  const coach = await prisma.coachProfile.findUnique({
+    where: { id: coachId },
+    select: {
+      id: true,
+      slug: true,
+      userId: true,
+    },
+  });
+
+  if (!coach) {
+    throw new Error("Coach introuvable.");
+  }
+
+  await prisma.$transaction([
+    prisma.coachProfile.delete({ where: { id: coachId } }),
+    prisma.user.update({ where: { id: coach.userId }, data: { role: Role.USER } }),
+  ]);
+
+  revalidatePath("/admin");
+  revalidatePath("/coachs");
+  revalidatePath("/coach-studio");
+  revalidatePath(`/coach/${coach.slug}`);
+}
+
 export async function adminReviewCoachApplicationAction(coachId: string, formData: FormData): Promise<void> {
   await requireAdminUser();
 
@@ -1100,6 +1187,33 @@ export async function adminToggleProgramPublishAction(programId: string): Promis
   revalidatePath("/admin");
   revalidatePath(`/coach/${program.coach.slug}`);
   revalidatePath(`/programmes/${program.id}`);
+}
+
+export async function adminDeleteProgramAction(programId: string, formData: FormData): Promise<void> {
+  await requireAdminUser();
+  ensureAdminDeletionConfirmed(formData);
+
+  const program = await prisma.program.findUnique({
+    where: { id: programId },
+    include: {
+      coach: {
+        select: {
+          slug: true,
+        },
+      },
+    },
+  });
+
+  if (!program) {
+    throw new Error("Programme introuvable.");
+  }
+
+  await deleteProgramPdfIfPresent(program.pdfUrl);
+  await prisma.program.delete({ where: { id: programId } });
+
+  revalidatePath("/admin");
+  revalidatePath(`/coach/${program.coach.slug}`);
+  revalidatePath(`/programmes/${programId}`);
 }
 
 export async function adminCreatePdfProgramAction(_: ActionState, formData: FormData): Promise<ActionState> {

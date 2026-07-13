@@ -170,7 +170,7 @@ export default async function OffresPage() {
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div className="space-y-2">
                   <p className="text-xl font-black text-[#101010]">{offer.note}</p>
-                  {offer.extra ? <p className="text-sm font-semibold text-[var(--accent)] md:text-base">{offer.extra}</p> : null}
+                  {offer.extra ? <p className="text-sm font-semibold text-black/70 md:text-base md:text-[var(--accent)]">{offer.extra}</p> : null}
                 </div>
                 <PlanCheckoutButton
                   plan={offer.planKey}
